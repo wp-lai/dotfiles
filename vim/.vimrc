@@ -83,3 +83,6 @@ let g:airline_theme="solarized"
 
 " enable mouse support
 set mouse=a
+
+" extend matchpairs
+set mps+=<:>
