@@ -31,6 +31,15 @@ Plugin 'VundleVim/Vundle.vim'
 Plugin 'nvie/vim-flake8'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
+" Plugin 'wikitopian/hardmode'
+" Plugin 'davidhalter/jedi-vim'
+Plugin 'ervandew/supertab'
+" Plugin 'epeli/slimux'
+Plugin 'maralla/completor.vim'
+" Plugin 'Shougo/neocomplete.vim'
+Plugin 'altercation/vim-colors-solarized'
+Plugin 'bronson/vim-trailing-whitespace'
+Plugin 'ctrlpvim/ctrlp.vim'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -51,21 +60,36 @@ filetype plugin indent on    " required
 " => Colors
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable syntax highlighting
-syntax enable 
+syntax enable
+
+" set dark background color
+" set background=dark
+colorscheme solarized
+if has('gui_running')
+    set background=light
+else
+    set background=dark
+endif
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => My Customizations
+" => Customizations about Python
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" display line number
-set number
-
-" setting for python
 set textwidth=79  " lines longer than 79 columns will be broken
 set shiftwidth=4  " operation >> indents 4 columns; << unindents 4 columns
 set tabstop=4     " a hard TAB displays as 4 columns
 set expandtab     " insert spaces when hitting TABs
 set softtabstop=4 " insert/delete 4 spaces when hitting a TAB/BACKSPACE
 set shiftround    " round indent to multiple of 'shiftwidth'
+set colorcolumn=80
+" autorun python
+nnoremap <buffer> <F9> :exec '!python' shellescape(@%, 1)<cr>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => My Customizations
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" display line number
+set number
+set relativenumber
 
 " Enable folding
 set foldmethod=indent
@@ -74,7 +98,7 @@ set foldlevel=99
 " UTF-8 support
 set encoding=utf-8
 
-" set status line 
+" set status line
 set laststatus=2
 " enable powerline-fonts
 let g:airline_powerline_fonts = 1
@@ -84,5 +108,9 @@ let g:airline_theme="solarized"
 " enable mouse support
 set mouse=a
 
-" extend matchpairs
-set mps+=<:>
+" copy paste to clipboard
+set clipboard=unnamed
+
+" config completor
+let g:completor_python_binary = '/Users/alan/anaconda/bin/python'
+let g:completor_clang_binary = '/usr/bin/clang'
