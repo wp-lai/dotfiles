@@ -40,6 +40,7 @@ Plugin 'maralla/completor.vim'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'bronson/vim-trailing-whitespace'
 Plugin 'ctrlpvim/ctrlp.vim'
+Plugin 'tpope/vim-surround'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -114,3 +115,6 @@ set clipboard=unnamed
 " config completor
 let g:completor_python_binary = '/Users/alan/anaconda/bin/python'
 let g:completor_clang_binary = '/usr/bin/clang'
+
+" edit crontab in Mac
+autocmd FileType crontab setlocal nowritebackup
