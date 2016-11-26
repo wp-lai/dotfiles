@@ -43,6 +43,9 @@ set wildmenu
 " UTF-8 support
 set encoding=utf-8
 
+" set 256 color
+set term=screen-256color
+
 " enable mouse support
 set mouse=a
 
@@ -51,9 +54,6 @@ set clipboard=unnamed
 
 " edit crontab in Mac
 autocmd FileType crontab setlocal nowritebackup
-
-" for gitgutter
-set updatetime=250
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugins
@@ -71,6 +71,7 @@ Plugin 'octol/vim-cpp-enhanced-highlight'
 Plugin 'derekwyatt/vim-fswitch'
 Plugin 'derekwyatt/vim-protodef'
 Plugin 'rdnetto/YCM-Generator'
+Plugin 'rhysd/vim-clang-format'
 
 " style
 Plugin 'altercation/vim-colors-solarized'
@@ -81,10 +82,10 @@ Plugin 'vim-airline/vim-airline-themes'
 " editing
 Plugin 'tpope/vim-surround'
 Plugin 'bronson/vim-trailing-whitespace'
+Plugin 'jiangmiao/auto-pairs'
 
 " marks
 Plugin 'kshenoy/vim-signature'
-Plugin 'vim-scripts/BOOKMARKS--Mark-and-Highlight-Full-Lines'
 
 " tags
 Plugin 'Valloric/YouCompleteMe'
@@ -108,11 +109,13 @@ Plugin 'fholgado/minibufexpl.vim'
 Plugin 'sjl/gundo.vim'
 
 " git
-Plugin 'airblade/vim-gitgutter'
 Plugin 'tpope/vim-fugitive'
 
 " Chinese input compatibility
 Plugin 'CodeFalling/fcitx-vim-osx'
+
+" tmux
+Plugin 'christoomey/vim-tmux-navigator'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -169,7 +172,7 @@ set cursorcolumn
 set colorcolumn=80
 
 " 高亮显示搜索结果
-set hlsearch
+" set hlsearch
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -220,34 +223,6 @@ nnoremap <F9> :exec '!python' shellescape(@%, 1)<CR>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vim-fswitch *.cpp 和 *.h 间切换
 nmap <silent> <Leader>sw :FSHere<cr>
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Signature
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:SignatureMap = {
-        \ 'Leader'             :  "m",
-        \ 'PlaceNextMark'      :  "m,",
-        \ 'ToggleMarkAtLine'   :  "m.",
-        \ 'PurgeMarksAtLine'   :  "m-",
-        \ 'DeleteMark'         :  "dm",
-        \ 'PurgeMarks'         :  "mda",
-        \ 'PurgeMarkers'       :  "m<BS>",
-        \ 'GotoNextLineAlpha'  :  "']",
-        \ 'GotoPrevLineAlpha'  :  "'[",
-        \ 'GotoNextSpotAlpha'  :  "`]",
-        \ 'GotoPrevSpotAlpha'  :  "`[",
-        \ 'GotoNextLineByPos'  :  "]'",
-        \ 'GotoPrevLineByPos'  :  "['",
-        \ 'GotoNextSpotByPos'  :  "mn",
-        \ 'GotoPrevSpotByPos'  :  "mp",
-        \ 'GotoNextMarker'     :  "[+",
-        \ 'GotoPrevMarker'     :  "[-",
-        \ 'GotoNextMarkerAny'  :  "]=",
-        \ 'GotoPrevMarkerAny'  :  "[=",
-        \ 'ListLocalMarks'     :  "ms",
-        \ 'ListLocalMarkers'   :  "m?"
-        \ }
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => tagbar
@@ -310,33 +285,21 @@ nmap <Leader>tp :tprevious<CR>
 let g:ycm_autoclose_preview_window_after_insertion = 1
 let g:ycm_autoclose_preview_window_after_completion = 1
 
-nnoremap <leader>jc :YcmCompleter GoToDeclaration<CR>
-" 只能是 #include 或已打开的文件
-nnoremap <leader>jd :YcmCompleter GoToDefinition<CR>
+"设置跳转的快捷键，可以跳转到definition和declaration
+nnoremap <leader>gc :YcmCompleter GoToDeclaration<CR>
+nnoremap <leader>gf :YcmCompleter GoToDefinition<CR>
+nnoremap <leader>gg :YcmCompleter GoToDefinitionElseDeclaration<CR>
 
 let g:ycm_server_keep_logfiles = 1
 let g:ycm_server_log_level = 'debug'
 
+" 设置 python 路径
 let g:ycm_python_binary_path = 'python'
-
+" 设置运行 ycm_server 的 python 路径
+let g:ycm_server_python_interpreter = '/Users/alan/anaconda3/bin/python'
 
 " 设置 default .ycm_extra_conf.py
-let g:ycm_global_ycm_extra_conf = '.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
-" 补全功能在注释中同样有效
-let g:ycm_complete_in_comments=1
-" 允许 vim 加载 .ycm_extra_conf.py 文件，不再提示
-" let g:ycm_confirm_extra_conf=0
-" 开启 YCM 标签补全引擎
-let g:ycm_collect_identifiers_from_tags_files=1
-" YCM 集成 OmniCppComplete 补全引擎，设置其快捷键
-inoremap <leader>; <C-x><C-o>
-" 从第一个键入字符就开始罗列匹配项
-let g:ycm_min_num_of_chars_for_completion=1
-" 禁止缓存匹配项，每次都重新生成匹配项
-let g:ycm_cache_omnifunc=0
-" 语法关键字补全
-let g:ycm_seed_identifiers_with_syntax=1
-
+let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Snippet
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -394,3 +357,26 @@ set undofile
 " undo 历史保存路径
 set undodir=~/.undo_history/
 
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => clang format
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:clang_format#style_options = {
+            \ "AccessModifierOffset" : -4,
+            \ "AllowShortIfStatementsOnASingleLine" : "true",
+            \ "AlwaysBreakTemplateDeclarations" : "true",
+            \ "Standard" : "C++11"}
+
+" map to <Leader>cf in C++ code
+autocmd FileType c,cpp,objc nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
+autocmd FileType c,cpp,objc vnoremap <buffer><Leader>cf :ClangFormat<CR>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => tmux
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:tmux_navigator_no_mappings = 1
+
+nnoremap <silent> <C-h> :TmuxNavigateLeft<cr>
+nnoremap <silent> <C-j> :TmuxNavigateDown<cr>
+nnoremap <silent> <C-k> :TmuxNavigateUp<cr>
+nnoremap <silent> <C-l> :TmuxNavigateRight<cr>
+nnoremap <silent> <C-/> :TmuxNavigatePrevious<cr>
