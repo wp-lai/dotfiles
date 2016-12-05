@@ -28,11 +28,13 @@ filetype on
 " " 根据侦测到的不同类型加载对应的插件
 filetype plugin on
 
-" 开启实时搜索功能
+" find as you type
 set incsearch
 
 " 搜索时大小写不敏感
 set ignorecase
+" 但当输入大写字符时只匹配大写
+set smartcase
 
 " 关闭兼容模式
 set nocompatible
@@ -43,14 +45,23 @@ set wildmenu
 " UTF-8 support
 set encoding=utf-8
 
-" set 256 color
-set term=screen-256color
-
 " enable mouse support
 set mouse=a
 
 " copy paste to clipboard
-set clipboard=unnamed
+" not applied in tmux
+if $TMUX == ''
+    set clipboard+=unnamed
+endif
+
+" set backspace
+set backspace=indent,eol,start
+
+" Prevents inserting two spaces after punctuation on a join (J)
+set nojoinspaces
+
+" show matching brakets/parenthesis
+set showmatch
 
 " edit crontab in Mac
 autocmd FileType crontab setlocal nowritebackup
@@ -83,6 +94,7 @@ Plugin 'vim-airline/vim-airline-themes'
 Plugin 'tpope/vim-surround'
 Plugin 'bronson/vim-trailing-whitespace'
 Plugin 'jiangmiao/auto-pairs'
+Plugin 'easymotion/vim-easymotion'
 
 " marks
 Plugin 'kshenoy/vim-signature'
@@ -150,6 +162,9 @@ set laststatus=2
 let g:airline_powerline_fonts = 1
 let g:airline_solarized_bg = "dark"
 let g:airline_theme = "solarized"
+
+" set 256 color
+set term=screen-256color
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Displays
@@ -228,47 +243,13 @@ nmap <silent> <Leader>sw :FSHere<cr>
 " => tagbar
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 设置 tagbar 子窗口的位置出现在主编辑区的左边
-let tagbar_left=1
+let tagbar_left=0
 " 设置显示／隐藏标签列表子窗口的快捷键。
-nmap <leader>tb :TagbarToggle<CR>
+nmap <C-t> :TagbarToggle<CR>
 " 设置标签子窗口的宽度
 let tagbar_width=32
 " tagbar 子窗口中不显示冗余帮助信息
 let g:tagbar_compact=1
-" 设置 ctags 对哪些代码标识符生成标签
-let g:tagbar_type_cpp = {
-    \ 'kinds' : [
-         \ 'c:classes:0:1',
-         \ 'd:macros:0:1',
-         \ 'e:enumerators:0:0',
-         \ 'f:functions:0:1',
-         \ 'g:enumeration:0:1',
-         \ 'l:local:0:1',
-         \ 'm:members:0:1',
-         \ 'n:namespaces:0:1',
-         \ 'p:functions_prototypes:0:1',
-         \ 's:structs:0:1',
-         \ 't:typedefs:0:1',
-         \ 'u:unions:0:1',
-         \ 'v:global:0:1',
-         \ 'x:external:0:1'
-     \ ],
-     \ 'sro'        : '::',
-     \ 'kind2scope' : {
-         \ 'g' : 'enum',
-         \ 'n' : 'namespace',
-         \ 'c' : 'class',
-         \ 's' : 'struct',
-         \ 'u' : 'union'
-     \ },
-     \ 'scope2kind' : {
-         \ 'enum'      : 'g',
-         \ 'namespace' : 'n',
-         \ 'class'     : 'c',
-         \ 'struct'    : 's',
-         \ 'union'     : 'u'
-     \ }
-\ }
 
 " 正向遍历同名标签
 nmap <Leader>tn :tnext<CR>
@@ -286,9 +267,9 @@ let g:ycm_autoclose_preview_window_after_insertion = 1
 let g:ycm_autoclose_preview_window_after_completion = 1
 
 "设置跳转的快捷键，可以跳转到definition和declaration
-nnoremap <leader>gc :YcmCompleter GoToDeclaration<CR>
-nnoremap <leader>gf :YcmCompleter GoToDefinition<CR>
-nnoremap <leader>gg :YcmCompleter GoToDefinitionElseDeclaration<CR>
+nnoremap <leader>dc :YcmCompleter GoToDeclaration<CR>
+nnoremap <leader>df :YcmCompleter GoToDefinition<CR>
+nnoremap <leader>dd :YcmCompleter GoToDefinitionElseDeclaration<CR>
 
 let g:ycm_server_keep_logfiles = 1
 let g:ycm_server_log_level = 'debug'
@@ -330,9 +311,9 @@ map <C-N> :NERDTreeToggle<CR>
 " 设置NERDTree子窗口宽度
 let NERDTreeWinSize=32
 " 设置NERDTree子窗口位置
-let NERDTreeWinPos="right"
+let NERDTreeWinPos="left"
 " 显示隐藏文件
-let NERDTreeShowHidden=1
+let NERDTreeShowHidden=0
 " NERDTree 子窗口中不显示冗余帮助信息
 let NERDTreeMinimalUI=1
 " 删除文件时自动删除文件对应 buffer
@@ -341,7 +322,7 @@ let NERDTreeAutoDeleteBuffer=1
 let NERDTreeIgnore=['\.pyc','\.swp']
 
 " 显示/隐藏 MiniBufExplorer 窗口
-map <Leader>bl :MBEToggle<CR>
+map <Leader>bb :MBEToggle<CR>
 " buffer 切换快捷键
 map <Leader>bn :MBEbn<CR>
 map <Leader>bp :MBEbp<CR>
@@ -351,7 +332,8 @@ map <Leader>bb :MBEFocus<CR>
 " => undo tree
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 调用 gundo 树
-nnoremap <Leader>ud :GundoToggle<CR>
+nnoremap <Leader>uu :GundoToggle<CR>
+let g:undotree_SetFocusWhenToggle=1
 " 开启保存 undo 历史功能
 set undofile
 " undo 历史保存路径
@@ -380,3 +362,18 @@ nnoremap <silent> <C-j> :TmuxNavigateDown<cr>
 nnoremap <silent> <C-k> :TmuxNavigateUp<cr>
 nnoremap <silent> <C-l> :TmuxNavigateRight<cr>
 nnoremap <silent> <C-/> :TmuxNavigatePrevious<cr>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => git
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nnoremap <silent> <leader>gs :Gstatus<CR>
+nnoremap <silent> <leader>gd :Gdiff<CR>
+nnoremap <silent> <leader>gc :Gcommit<CR>
+nnoremap <silent> <leader>gb :Gblame<CR>
+nnoremap <silent> <leader>gl :Glog<CR>
+nnoremap <silent> <leader>gp :Git push<CR>
+nnoremap <silent> <leader>gr :Gread<CR>
+nnoremap <silent> <leader>gw :Gwrite<CR>
+nnoremap <silent> <leader>ge :Gedit<CR>
+" Mnemonic _i_nteractive
+nnoremap <silent> <leader>gi :Git add -p %<CR>
