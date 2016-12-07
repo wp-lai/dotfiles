@@ -1,8 +1,8 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => keymappings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 定义快捷键的前缀，即 <leader>
-let mapleader=";"
+" map <leader>, default is '\'
+" let mapleader=";"
 
 " 设置快捷键将选中文本块复制至系统剪贴板
 vnoremap <leader>y "+y
@@ -12,31 +12,26 @@ nmap <leader>p "+p
 " 依次遍历
 nnoremap nw <c-w><c-w>
 " 定义快捷键关闭当前分割窗口
-nmap <Leader>q :q<CR>
+nmap <leader>q :q<CR>
 " 定义快捷键保存当前窗口内容
-nmap <Leader>w :w<CR>
+nmap <leader>w :w<CR>
 " 定义快捷键保存所有窗口内容并退出 vim
-nmap <Leader>WQ :wa<CR>:q<CR>
+nmap <leader>WQ :wa<CR>:q<CR>
 " 不做任何保存，直接退出 vim
-nmap <Leader>Q :qa!<CR>
+nmap <leader>Q :qa!<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => others
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 开启文件类型侦测
-filetype on
 " " 根据侦测到的不同类型加载对应的插件
-filetype plugin on
-
-" find as you type
-set incsearch
+filetype plugin indent on
 
 " 搜索时大小写不敏感
 set ignorecase
 " 但当输入大写字符时只匹配大写
 set smartcase
 
-" 关闭兼容模式
+" use vim default instead of vi default
 set nocompatible
 
 " vim 自身命令行模式智能补全
@@ -69,86 +64,77 @@ autocmd FileType crontab setlocal nowritebackup
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugins
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" set the runtime path to include vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-Plugin 'VundleVim/Vundle.vim'
+call plug#begin('~/.vim/bundle')
+    " python
+    Plug 'nvie/vim-flake8', { 'for': 'python' }
 
-" python
-Plugin 'nvie/vim-flake8'
+    " cpp
+    Plug 'octol/vim-cpp-enhanced-highlight', { 'for': 'cpp' }
+    Plug 'derekwyatt/vim-fswitch', { 'for': 'cpp' }
+    Plug 'derekwyatt/vim-protodef', { 'for': 'cpp' }
+    Plug 'rhysd/vim-clang-format', { 'for': 'cpp' }
 
-" cpp
-Plugin 'octol/vim-cpp-enhanced-highlight'
-Plugin 'derekwyatt/vim-fswitch'
-Plugin 'derekwyatt/vim-protodef'
-Plugin 'rdnetto/YCM-Generator'
-Plugin 'rhysd/vim-clang-format'
+    " style
+    " Plug 'altercation/vim-colors-solarized'
+    Plug 'nathanaelkane/vim-indent-guides'
+    Plug 'vim-airline/vim-airline'
+    Plug 'vim-airline/vim-airline-themes'
+    Plug 'junegunn/goyo.vim', { 'on': 'Goyo' }
+    Plug 'mhinz/vim-startify'
 
-" style
-Plugin 'altercation/vim-colors-solarized'
-Plugin 'nathanaelkane/vim-indent-guides'
-Plugin 'vim-airline/vim-airline'
-Plugin 'vim-airline/vim-airline-themes'
+    " editing
+    Plug 'tpope/vim-surround'
+    Plug 'bronson/vim-trailing-whitespace'
+    Plug 'jiangmiao/auto-pairs'
+    Plug 'easymotion/vim-easymotion'
 
-" editing
-Plugin 'tpope/vim-surround'
-Plugin 'bronson/vim-trailing-whitespace'
-Plugin 'jiangmiao/auto-pairs'
-Plugin 'easymotion/vim-easymotion'
+    " marks
+    Plug 'kshenoy/vim-signature'
 
-" marks
-Plugin 'kshenoy/vim-signature'
+    " tags
+    Plug 'Valloric/YouCompleteMe'
+    Plug 'majutsushi/tagbar'
 
-" tags
-Plugin 'Valloric/YouCompleteMe'
-Plugin 'majutsushi/tagbar'
+    " search and replace
+    Plug 'dyng/ctrlsf.vim', { 'on': 'CtrlSF' }
 
-" search and replace
-Plugin 'dyng/ctrlsf.vim'
+    " comment and uncomment
+    Plug 'scrooloose/nerdcommenter'
 
-" comment and uncomment
-Plugin 'scrooloose/nerdcommenter'
+    " snippet
+    Plug 'SirVer/ultisnips'
 
-" snippet
-Plugin 'SirVer/ultisnips'
+    " file navigation
+    Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
+    Plug 'ctrlpvim/ctrlp.vim'
+    Plug 'fholgado/minibufexpl.vim'
+    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+    Plug 'mhinz/vim-sayonara', { 'on': 'Sayonara'  }
 
-" file navigation
-Plugin 'scrooloose/nerdtree'
-Plugin 'ctrlpvim/ctrlp.vim'
-Plugin 'fholgado/minibufexpl.vim'
 
-" undo tree
-Plugin 'sjl/gundo.vim'
+    " undo tree
+    Plug 'sjl/gundo.vim', { 'on': 'GundoToggle' }
 
-" git
-Plugin 'tpope/vim-fugitive'
+    " git
+    Plug 'tpope/vim-fugitive'
+    Plug 'airblade/vim-gitgutter'
 
-" Chinese input compatibility
-Plugin 'CodeFalling/fcitx-vim-osx'
+    " Chinese input compatibility
+    Plug 'CodeFalling/fcitx-vim-osx'
 
-" tmux
-Plugin 'christoomey/vim-tmux-navigator'
-
-" All of your Plugins must be added before the following line
-call vundle#end()            " required
-filetype plugin indent on    " required
-" To ignore plugin indent changes, instead use:
-"filetype plugin on
-"
-" Brief help
-" :PluginList       - lists configured plugins
-" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
-" :PluginSearch foo - searches for foo; append `!` to refresh local cache
-" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
-"
-" see :h vundle for more details or wiki for FAQ
-" Put your non-Plugin stuff after this line
+    " tmux
+    Plug 'christoomey/vim-tmux-navigator'
+    Plug 'jpalardy/vim-slime'
+call plug#end()
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Colors
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" set dark background color
-colorscheme solarized
+" set color
+colorscheme Tomorrow-Night-Eighties
+" colorscheme Tomorrow-Night
+" colorscheme solarized
+" colorscheme molokai
 
 if has('gui_running')
     set background=light
@@ -160,8 +146,10 @@ endif
 " vim-airline
 set laststatus=2
 let g:airline_powerline_fonts = 1
-let g:airline_solarized_bg = "dark"
-let g:airline_theme = "solarized"
+" let g:airline_solarized_bg = "dark"
+" let g:airline_theme = "solarized"
+let g:airline_theme = "tomorrow"
+
 
 " set 256 color
 set term=screen-256color
@@ -188,7 +176,13 @@ set colorcolumn=80
 
 " 高亮显示搜索结果
 " set hlsearch
+" Highlight while searching with / or ?
+set incsearch
 
+" Show current mode in command-line
+set showmode
+" Show already typed keys when more are expected
+set showcmd
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Coding
@@ -207,7 +201,7 @@ set expandtab
 set tabstop=4
 " 设置格式化时制表符占用空格数
 set shiftwidth=4
-" 让 vim 把连续数量的空格视为一个制表符
+" Tab key indents by 4 spaces
 set softtabstop=4
 
 " 缩进可视化插件 Indent Guides
@@ -218,7 +212,7 @@ let g:indent_guides_start_level=2
 " 色块宽度
 let g:indent_guides_guide_size=1
 " 快捷键 i 开/关缩进可视化
-nmap <silent> <Leader>i <Plug>IndentGuidesToggle
+nmap <silent> <leader>i <Plug>IndentGuidesToggle
 
 " 基于缩进或语法进行代码折叠
 set foldmethod=indent
@@ -237,7 +231,20 @@ nnoremap <F9> :exec '!python' shellescape(@%, 1)<CR>
 " => Customizations about c++
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vim-fswitch *.cpp 和 *.h 间切换
-nmap <silent> <Leader>sw :FSHere<cr>
+nmap <silent> <leader>sw :FSHere<cr>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => clang format
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:clang_format#style_options = {
+            \ "AccessModifierOffset" : -4,
+            \ "AllowShortIfStatementsOnASingleLine" : "true",
+            \ "AlwaysBreakTemplateDeclarations" : "true",
+            \ "Standard" : "C++11"}
+
+" map to <leader>cf in C++ code
+autocmd FileType c,cpp,objc nnoremap <buffer><leader>cf :<C-u>ClangFormat<CR>
+autocmd FileType c,cpp,objc vnoremap <buffer><leader>cf :ClangFormat<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => tagbar
@@ -252,15 +259,18 @@ let tagbar_width=32
 let g:tagbar_compact=1
 
 " 正向遍历同名标签
-nmap <Leader>tn :tnext<CR>
+nmap <leader>tn :tnext<CR>
 " 反向遍历同名标签
-nmap <Leader>tp :tprevious<CR>
+nmap <leader>tp :tprevious<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => YCM
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 补全内容不以分割子窗口形式出现，只显示补全列表
 " set completeopt-=preview
+
+" do not insert until we choose one
+set completeopt+=noselect
 
 " 设置 preview window
 let g:ycm_autoclose_preview_window_after_insertion = 1
@@ -280,7 +290,7 @@ let g:ycm_python_binary_path = 'python'
 let g:ycm_server_python_interpreter = '/Users/alan/anaconda3/bin/python'
 
 " 设置 default .ycm_extra_conf.py
-let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'
+let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Snippet
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -295,19 +305,19 @@ let g:UltiSnipsJumpBackwardTrigger="<leader><s-tab>"
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 使用 ctrlsf.vim 插件在工程内全局查找光标所在关键字，设置快捷键。
 " 快捷键速记法：search in project
-nnoremap <Leader>sp :CtrlSF<CR>
+nnoremap <leader>sp :CtrlSF<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => vim-protodef
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 成员函数的实现顺序与声明顺序一致
-let g:disable_protodef_sorting=1
+" let g:disable_protodef_sorting=1
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => file navigation
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 使用 NERDTree 插件查看工程文件。设置快捷键，速记：file list
-map <C-N> :NERDTreeToggle<CR>
+nnoremap <C-N> :NERDTreeToggle<CR>
 " 设置NERDTree子窗口宽度
 let NERDTreeWinSize=32
 " 设置NERDTree子窗口位置
@@ -322,35 +332,22 @@ let NERDTreeAutoDeleteBuffer=1
 let NERDTreeIgnore=['\.pyc','\.swp']
 
 " 显示/隐藏 MiniBufExplorer 窗口
-map <Leader>bb :MBEToggle<CR>
+nnoremap <leader>bb :MBEToggle<CR>
 " buffer 切换快捷键
-map <Leader>bn :MBEbn<CR>
-map <Leader>bp :MBEbp<CR>
-map <Leader>bb :MBEFocus<CR>
+nnoremap <leader>bn :MBEbn<CR>
+nnoremap <leader>bp :MBEbp<CR>
+nnoremap <leader>bb :MBEFocus<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => undo tree
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 调用 gundo 树
-nnoremap <Leader>uu :GundoToggle<CR>
+nnoremap <leader>uu :GundoToggle<CR>
 let g:undotree_SetFocusWhenToggle=1
 " 开启保存 undo 历史功能
 set undofile
 " undo 历史保存路径
 set undodir=~/.undo_history/
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => clang format
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:clang_format#style_options = {
-            \ "AccessModifierOffset" : -4,
-            \ "AllowShortIfStatementsOnASingleLine" : "true",
-            \ "AlwaysBreakTemplateDeclarations" : "true",
-            \ "Standard" : "C++11"}
-
-" map to <Leader>cf in C++ code
-autocmd FileType c,cpp,objc nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
-autocmd FileType c,cpp,objc vnoremap <buffer><Leader>cf :ClangFormat<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => tmux
@@ -362,6 +359,13 @@ nnoremap <silent> <C-j> :TmuxNavigateDown<cr>
 nnoremap <silent> <C-k> :TmuxNavigateUp<cr>
 nnoremap <silent> <C-l> :TmuxNavigateRight<cr>
 nnoremap <silent> <C-/> :TmuxNavigatePrevious<cr>
+
+" vim-slime
+let g:slime_target = "tmux"
+let g:slime_paste_file = "$HOME/.slime_paste"
+let g:slime_default_config = {"socket_name": "default", "target_pane": "1"}
+let g:slime_dont_ask_default = 1
+let g:slime_python_ipython = 1
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => git
@@ -377,3 +381,26 @@ nnoremap <silent> <leader>gw :Gwrite<CR>
 nnoremap <silent> <leader>ge :Gedit<CR>
 " Mnemonic _i_nteractive
 nnoremap <silent> <leader>gi :Git add -p %<CR>
+
+" don't want vim-gitgutter to set up any mappings
+let g:gitgutter_map_keys = 0
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => fzf
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set rtp+=/usr/local/opt/fzf
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => backup
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Put all temporary files under the same directory.
+" https://github.com/mhinz/vim-galore#handling-backup-swap-undo-and-viminfo-files
+" set backup
+" set backupdir   =$HOME/.vim/files/backup/
+" set backupext   =-vimbackup
+" set backupskip  =
+" set directory   =$HOME/.vim/files/swap/
+" set updatecount =100
+" set undofile
+" set undodir     =$HOME/.vim/files/undo/
+" set viminfo     ='100,n$HOME/.vim/files/info/viminfo
