@@ -20,6 +20,14 @@ nmap <leader>WQ :wa<CR>:q<CR>
 " 不做任何保存，直接退出 vim
 nmap <leader>Q :qa!<CR>
 
+" quickly move current line up or down
+nnoremap [e  :<c-u>execute 'move -1-'. v:count1<cr>
+nnoremap ]e  :<c-u>execute 'move +'. v:count1<cr>
+
+" quickly add empty lines
+nnoremap [<space>  :<c-u>put! =repeat(nr2char(10), v:count1)<cr>'[
+nnoremap ]<space>  :<c-u>put =repeat(nr2char(10), v:count1)<cr>
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => others
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -61,18 +69,38 @@ set showmatch
 " edit crontab in Mac
 autocmd FileType crontab setlocal nowritebackup
 
+" restore cursor position when opening file
+autocmd BufReadPost *
+    \ if line("'\"") > 1 && line("'\"") <= line("$") |
+    \   exe "normal! g`\"" |
+    \ endif"`'")"'")
+
+" enable matchit functionality
+if !exists('g:loaded_matchit')
+  runtime macros/matchit.vim
+endif
+
+" source vimrc on saving
+" autocmd BufWritePost $MYVIMRC source $MYVIMRC
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugins
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call plug#begin('~/.vim/bundle')
+    " async run
+    Plug 'skywind3000/asyncrun.vim', { 'on': 'AsyncRun' }
+
+    " lint
+    Plug 'maralla/validator.vim', { 'for': 'python' }
+
     " python
     Plug 'nvie/vim-flake8', { 'for': 'python' }
 
     " cpp
     Plug 'octol/vim-cpp-enhanced-highlight', { 'for': 'cpp' }
-    Plug 'derekwyatt/vim-fswitch', { 'for': 'cpp' }
+    Plug 'derekwyatt/vim-fswitch', { 'for': ['c', 'cpp'] }
     Plug 'derekwyatt/vim-protodef', { 'for': 'cpp' }
-    Plug 'rhysd/vim-clang-format', { 'for': 'cpp' }
+    Plug 'rhysd/vim-clang-format', { 'for': ['c', 'cpp'] }
 
     " style
     " Plug 'altercation/vim-colors-solarized'
@@ -80,6 +108,7 @@ call plug#begin('~/.vim/bundle')
     Plug 'vim-airline/vim-airline'
     Plug 'vim-airline/vim-airline-themes'
     Plug 'junegunn/goyo.vim', { 'on': 'Goyo' }
+    Plug 'junegunn/limelight.vim', { 'on': 'Limelight' }
     Plug 'mhinz/vim-startify'
 
     " editing
@@ -96,7 +125,7 @@ call plug#begin('~/.vim/bundle')
     Plug 'majutsushi/tagbar'
 
     " search and replace
-    Plug 'dyng/ctrlsf.vim', { 'on': 'CtrlSF' }
+    Plug 'mhinz/vim-grepper', { 'on': 'Grepper' }
 
     " comment and uncomment
     Plug 'scrooloose/nerdcommenter'
@@ -108,9 +137,8 @@ call plug#begin('~/.vim/bundle')
     Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
     Plug 'ctrlpvim/ctrlp.vim'
     Plug 'fholgado/minibufexpl.vim'
-    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+    Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim'
     Plug 'mhinz/vim-sayonara', { 'on': 'Sayonara'  }
-
 
     " undo tree
     Plug 'sjl/gundo.vim', { 'on': 'GundoToggle' }
@@ -132,15 +160,13 @@ call plug#end()
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " set color
 colorscheme Tomorrow-Night-Eighties
+set background=dark
 " colorscheme Tomorrow-Night
 " colorscheme solarized
 " colorscheme molokai
 
 if has('gui_running')
-    set background=light
     set guifont=Source\ Code\ Pro\ for\ Powerline:h14
-else
-    set background=dark
 endif
 
 " vim-airline
@@ -149,6 +175,8 @@ let g:airline_powerline_fonts = 1
 " let g:airline_solarized_bg = "dark"
 " let g:airline_theme = "solarized"
 let g:airline_theme = "tomorrow"
+" display the status of AsyncRun
+" let g:airline_section_error = airline#section#create_right(['%{g:asyncrun_status}'])
 
 
 " set 256 color
@@ -212,10 +240,10 @@ let g:indent_guides_start_level=2
 " 色块宽度
 let g:indent_guides_guide_size=1
 " 快捷键 i 开/关缩进可视化
-nmap <silent> <leader>i <Plug>IndentGuidesToggle
+nnoremap <silent> <leader>i <Plug>IndentGuidesToggle
 
 " 基于缩进或语法进行代码折叠
-set foldmethod=indent
+" set foldmethod=indent
 " set foldmethod=syntax
 
 " 启动 vim 时关闭折叠代码
@@ -225,11 +253,20 @@ set nofoldenable
 " => Customizations about Python
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " autorun python
-nnoremap <F9> :exec '!python' shellescape(@%, 1)<CR>
+autocmd FileType python nnoremap <F9> :exec '!python' shellescape(@%, 1)<CR>
 
+" add matching pairs
+autocmd FileType python let b:match_words = '\<if\>:\<elif\>:\<else\>'
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Customizations about c++
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" auto compile and run C
+autocmd FileType c nnoremap <F9> gcc % && ./a.out <CR>
+set tags+=~/.vim/systags
+
+" auto compile and run C++
+autocmd FileType cpp nnoremap <F9>: !g++c % && ./a.out <CR>
+
 " vim-fswitch *.cpp 和 *.h 间切换
 nmap <silent> <leader>sw :FSHere<cr>
 
@@ -294,18 +331,12 @@ let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Snippet
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:UltiSnipsSnippetDirectories=["mysnippets"]
+let g:UltiSnipsSnippetDirectories=['mysnippets']
+let g:UltiSnipsSnippetsDir='~/.vim/bundle/ultisnips/mysnippets'
 " UltiSnips 的 tab 键与 YCM 冲突，重新设定
 let g:UltiSnipsExpandTrigger="<leader><tab>"
 let g:UltiSnipsJumpForwardTrigger="<leader><tab>"
 let g:UltiSnipsJumpBackwardTrigger="<leader><s-tab>"
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => CtrlSF
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 使用 ctrlsf.vim 插件在工程内全局查找光标所在关键字，设置快捷键。
-" 快捷键速记法：search in project
-nnoremap <leader>sp :CtrlSF<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => vim-protodef
@@ -344,11 +375,14 @@ nnoremap <leader>bb :MBEFocus<CR>
 " 调用 gundo 树
 nnoremap <leader>uu :GundoToggle<CR>
 let g:undotree_SetFocusWhenToggle=1
+
+" keep focus in the Gundo window after a revert
+let g:gundo_return_on_revert=0
+
 " 开启保存 undo 历史功能
 set undofile
 " undo 历史保存路径
 set undodir=~/.undo_history/
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => tmux
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -388,19 +422,28 @@ let g:gitgutter_map_keys = 0
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => fzf
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set rtp+=/usr/local/opt/fzf
+" Mapping selecting mappings
+nmap <leader><tab> <plug>(fzf-maps-n)
+xmap <leader><tab> <plug>(fzf-maps-x)
+omap <leader><tab> <plug>(fzf-maps-o)
+
+" Insert mode completion
+" imap <c-x><c-k> <plug>(fzf-complete-word)
+" imap <c-x><c-f> <plug>(fzf-complete-path)
+" imap <c-x><c-j> <plug>(fzf-complete-file-ag)
+" imap <c-x><c-l> <plug>(fzf-complete-line)
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => backup
+" => Goyo & Limelight
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Put all temporary files under the same directory.
-" https://github.com/mhinz/vim-galore#handling-backup-swap-undo-and-viminfo-files
-" set backup
-" set backupdir   =$HOME/.vim/files/backup/
-" set backupext   =-vimbackup
-" set backupskip  =
-" set directory   =$HOME/.vim/files/swap/
-" set updatecount =100
-" set undofile
-" set undodir     =$HOME/.vim/files/undo/
-" set viminfo     ='100,n$HOME/.vim/files/info/viminfo
+autocmd! User GoyoEnter Limelight
+autocmd! User GoyoLeave Limelight!
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Grepper
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" search in current dir
+nnoremap <leader>f :Grepper -tool pt <cr>
+" search in current buffers
+nnoremap <leader>F :Grepper -tool pt -buffers <cr>
+
