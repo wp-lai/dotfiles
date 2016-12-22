@@ -86,6 +86,13 @@ endif
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugins
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" autoinstall Plug
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall | source $MYVIMRC
+endif
+
 call plug#begin('~/.vim/bundle')
     " async run
     Plug 'skywind3000/asyncrun.vim', { 'on': 'AsyncRun' }
@@ -146,6 +153,7 @@ call plug#begin('~/.vim/bundle')
     " git
     Plug 'tpope/vim-fugitive'
     Plug 'airblade/vim-gitgutter'
+    Plug 'junegunn/gv.vim'
 
     " Chinese input compatibility
     Plug 'CodeFalling/fcitx-vim-osx'
@@ -261,11 +269,11 @@ autocmd FileType python let b:match_words = '\<if\>:\<elif\>:\<else\>'
 " => Customizations about c++
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " auto compile and run C
-autocmd FileType c nnoremap <F9> gcc % && ./a.out <CR>
+autocmd FileType c nnoremap <F9> :!gcc % && ./a.out <CR>
 set tags+=~/.vim/systags
 
 " auto compile and run C++
-autocmd FileType cpp nnoremap <F9>: !g++c % && ./a.out <CR>
+autocmd FileType cpp nnoremap <F9> :!clang++ % && ./a.out <CR>
 
 " vim-fswitch *.cpp 和 *.h 间切换
 nmap <silent> <leader>sw :FSHere<cr>
