@@ -261,7 +261,7 @@ set nofoldenable
 " => Customizations about Python
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " autorun python
-autocmd FileType python nnoremap <F9> :exec '!python' shellescape(@%, 1)<CR>
+"autocmd FileType python nnoremap <F9> :exec '!python' shellescape(@%, 1)<CR>
 
 " add matching pairs
 autocmd FileType python let b:match_words = '\<if\>:\<elif\>:\<else\>'
@@ -269,11 +269,11 @@ autocmd FileType python let b:match_words = '\<if\>:\<elif\>:\<else\>'
 " => Customizations about c++
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " auto compile and run C
-autocmd FileType c nnoremap <F9> :!gcc % && ./a.out <CR>
+"autocmd FileType c nnoremap <F9> :!gcc % && ./a.out <CR>
 set tags+=~/.vim/systags
 
 " auto compile and run C++
-autocmd FileType cpp nnoremap <F9> :!clang++ % && ./a.out <CR>
+"autocmd FileType cpp nnoremap <F9> :!clang++ % && ./a.out <CR>
 
 " vim-fswitch *.cpp 和 *.h 间切换
 nmap <silent> <leader>sw :FSHere<cr>
@@ -336,6 +336,9 @@ let g:ycm_server_python_interpreter = '/Users/alan/anaconda3/bin/python'
 
 " 设置 default .ycm_extra_conf.py
 let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
+
+" 打开 .ycm_extra_conf.py 时是否进行确认
+let g:ycm_confirm_extra_conf = 0
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Snippet
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -455,3 +458,20 @@ nnoremap <leader>f :Grepper -tool pt <cr>
 " search in current buffers
 nnoremap <leader>F :Grepper -tool pt -buffers <cr>
 
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Auto Run
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nnoremap <F9> :call CompileAndRun()<CR>
+func! CompileAndRun()
+    exec "w"
+    if &filetype == 'c'
+        exec "!clang % -o %<"
+        exec "!time ./%<"
+    elseif &filetype == 'cpp'
+        exec "!clang++ -std=c++1y % -o %<"
+        exec "!time ./%<"
+    elseif &filetype == 'python'
+        exec "!time python %"
+    endif
+endfunc
