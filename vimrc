@@ -2,7 +2,9 @@
 " => keymappings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " map <leader>, default is '\'
-" let mapleader=";"
+" let mapleader=""
+nmap <Space> <leader>
+vmap <Space> <leader>
 
 " 设置快捷键将选中文本块复制至系统剪贴板
 vnoremap <leader>y "+y
@@ -15,6 +17,8 @@ nnoremap nw <c-w><c-w>
 nmap <leader>q :q<CR>
 " 定义快捷键保存当前窗口内容
 nmap <leader>w :w<CR>
+" save and quit
+nmap <leader>e :wq<CR>
 " 定义快捷键保存所有窗口内容并退出 vim
 nmap <leader>WQ :wa<CR>:q<CR>
 " 不做任何保存，直接退出 vim
@@ -66,6 +70,10 @@ set nojoinspaces
 " show matching brakets/parenthesis
 set showmatch
 
+" more natural split opening
+" set splitbelow
+set splitright
+
 " edit crontab in Mac
 autocmd FileType crontab setlocal nowritebackup
 
@@ -73,7 +81,7 @@ autocmd FileType crontab setlocal nowritebackup
 autocmd BufReadPost *
     \ if line("'\"") > 1 && line("'\"") <= line("$") |
     \   exe "normal! g`\"" |
-    \ endif"`'")"'")
+    \ endif "`'")"'")
 
 " enable matchit functionality
 if !exists('g:loaded_matchit')
@@ -95,10 +103,20 @@ endif
 
 call plug#begin('~/.vim/bundle')
     " async run
-    Plug 'skywind3000/asyncrun.vim', { 'on': 'AsyncRun' }
+    " Plug 'skywind3000/asyncrun.vim', { 'on': 'AsyncRun' }
 
     " lint
-    Plug 'maralla/validator.vim', { 'for': 'python' }
+    " Plug 'maralla/validator.vim', { 'for': 'python' }
+    Plug 'w0rp/ale'
+        nmap <silent> <C-k> <Plug>(ale_previous_wrap)
+        nmap <silent> <C-j> <Plug>(ale_next_wrap)
+        let g:ale_lint_on_save = 1
+        let g:ale_lint_on_text_changed = 0
+        " if you don't want linters to run on opening a file
+        let g:ale_lint_on_enter = 0
+        let g:ale_linters = {
+        \   'python': ['flake8'],
+        \}
 
     " python
     Plug 'nvie/vim-flake8', { 'for': 'python' }
@@ -118,21 +136,25 @@ call plug#begin('~/.vim/bundle')
     Plug 'junegunn/limelight.vim', { 'on': 'Limelight' }
     Plug 'mhinz/vim-startify'
 
+    " formatter
+    " Plug 'sbdchd/neoformat'
+
     " editing
     Plug 'tpope/vim-surround'
     Plug 'bronson/vim-trailing-whitespace'
     Plug 'jiangmiao/auto-pairs'
     Plug 'easymotion/vim-easymotion'
+    Plug 'vim-voom/VOoM'
 
     " marks
-    Plug 'kshenoy/vim-signature'
+    " Plug 'kshenoy/vim-signature'
 
     " tags
     Plug 'Valloric/YouCompleteMe'
     Plug 'majutsushi/tagbar'
 
     " search and replace
-    Plug 'mhinz/vim-grepper', { 'on': 'Grepper' }
+    " Plug 'mhinz/vim-grepper', { 'on': 'Grepper' }
 
     " comment and uncomment
     Plug 'scrooloose/nerdcommenter'
@@ -144,11 +166,14 @@ call plug#begin('~/.vim/bundle')
     Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
     Plug 'ctrlpvim/ctrlp.vim'
     Plug 'fholgado/minibufexpl.vim'
-    Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim'
-    Plug 'mhinz/vim-sayonara', { 'on': 'Sayonara'  }
+    " Plug 'junegunn/fzf', { 'dir': '/usr/local/opt/fzf', 'do': './install --all' }
+
+    " code search
+    Plug 'dyng/ctrlsf.vim'
+        nmap     <C-F>f <Plug>CtrlSFPrompt
 
     " undo tree
-    Plug 'sjl/gundo.vim', { 'on': 'GundoToggle' }
+    " Plug 'sjl/gundo.vim', { 'on': 'GundoToggle' }
 
     " git
     Plug 'tpope/vim-fugitive'
@@ -265,6 +290,12 @@ set nofoldenable
 
 " add matching pairs
 autocmd FileType python let b:match_words = '\<if\>:\<elif\>:\<else\>'
+
+" run yapf formater
+autocmd FileType python nnoremap <leader>ya :0,$!yapf<Cr><C-o>
+
+" add breakpoint
+autocmd FileType python nnoremap <leader>bk :normal Oimport ipdb; ipdb.set_trace()<ESC>j
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Customizations about c++
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -277,6 +308,7 @@ set tags+=~/.vim/systags
 
 " vim-fswitch *.cpp 和 *.h 间切换
 nmap <silent> <leader>sw :FSHere<cr>
+let b:fswitchdst  = 'cpp, h'
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => clang format
@@ -297,7 +329,7 @@ autocmd FileType c,cpp,objc vnoremap <buffer><leader>cf :ClangFormat<CR>
 " 设置 tagbar 子窗口的位置出现在主编辑区的左边
 let tagbar_left=0
 " 设置显示／隐藏标签列表子窗口的快捷键。
-nmap <C-t> :TagbarToggle<CR>
+nmap <leader>tt :TagbarToggle<CR>
 " 设置标签子窗口的宽度
 let tagbar_width=32
 " tagbar 子窗口中不显示冗余帮助信息
@@ -321,10 +353,15 @@ set completeopt+=noselect
 let g:ycm_autoclose_preview_window_after_insertion = 1
 let g:ycm_autoclose_preview_window_after_completion = 1
 
+" 设置新窗口打开位置
+let g:ycm_goto_buffer_command = 'vertical-split'
+
 "设置跳转的快捷键，可以跳转到definition和declaration
 nnoremap <leader>dc :YcmCompleter GoToDeclaration<CR>
 nnoremap <leader>df :YcmCompleter GoToDefinition<CR>
-nnoremap <leader>dd :YcmCompleter GoToDefinitionElseDeclaration<CR>
+nnoremap <leader>ji :YcmCompleter GoToInclude<CR>
+nnoremap <leader>jj :YcmCompleter GoToImprecise<CR>
+nnoremap <leader>jh :YcmCompleter GetDoc<CR>
 
 let g:ycm_server_keep_logfiles = 1
 let g:ycm_server_log_level = 'debug'
@@ -374,26 +411,23 @@ let NERDTreeAutoDeleteBuffer=1
 let NERDTreeIgnore=['\.pyc','\.swp']
 
 " 显示/隐藏 MiniBufExplorer 窗口
-nnoremap <leader>bb :MBEToggle<CR>
-" buffer 切换快捷键
-nnoremap <leader>bn :MBEbn<CR>
-nnoremap <leader>bp :MBEbp<CR>
+" nnoremap <leader>bb :MBEToggle<CR>
 nnoremap <leader>bb :MBEFocus<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => undo tree
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 调用 gundo 树
-nnoremap <leader>uu :GundoToggle<CR>
-let g:undotree_SetFocusWhenToggle=1
+" nnoremap <leader>uu :GundoToggle<CR>
+" let g:undotree_SetFocusWhenToggle=1
 
 " keep focus in the Gundo window after a revert
-let g:gundo_return_on_revert=0
+" let g:gundo_return_on_revert=0
 
 " 开启保存 undo 历史功能
-set undofile
+" set undofile
 " undo 历史保存路径
-set undodir=~/.undo_history/
+" set undodir=~/.undo_history/
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => tmux
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -415,17 +449,17 @@ let g:slime_python_ipython = 1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => git
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-nnoremap <silent> <leader>gs :Gstatus<CR>
-nnoremap <silent> <leader>gd :Gdiff<CR>
-nnoremap <silent> <leader>gc :Gcommit<CR>
-nnoremap <silent> <leader>gb :Gblame<CR>
-nnoremap <silent> <leader>gl :Glog<CR>
-nnoremap <silent> <leader>gp :Git push<CR>
-nnoremap <silent> <leader>gr :Gread<CR>
-nnoremap <silent> <leader>gw :Gwrite<CR>
-nnoremap <silent> <leader>ge :Gedit<CR>
-" Mnemonic _i_nteractive
-nnoremap <silent> <leader>gi :Git add -p %<CR>
+"nnoremap <silent> <leader>gs :Gstatus<CR>
+"nnoremap <silent> <leader>gd :Gdiff<CR>
+"nnoremap <silent> <leader>gc :Gcommit<CR>
+"nnoremap <silent> <leader>gb :Gblame<CR>
+"nnoremap <silent> <leader>gl :Glog<CR>
+"nnoremap <silent> <leader>gp :Git push<CR>
+"nnoremap <silent> <leader>gr :Gread<CR>
+"nnoremap <silent> <leader>gw :Gwrite<CR>
+"nnoremap <silent> <leader>ge :Gedit<CR>
+"" Mnemonic _i_nteractive
+"nnoremap <silent> <leader>gi :Git add -p %<CR>
 
 " don't want vim-gitgutter to set up any mappings
 let g:gitgutter_map_keys = 0
@@ -434,9 +468,9 @@ let g:gitgutter_map_keys = 0
 " => fzf
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Mapping selecting mappings
-nmap <leader><tab> <plug>(fzf-maps-n)
-xmap <leader><tab> <plug>(fzf-maps-x)
-omap <leader><tab> <plug>(fzf-maps-o)
+" nmap <leader><tab> <plug>(fzf-maps-n)
+" xmap <leader><tab> <plug>(fzf-maps-x)
+" omap <leader><tab> <plug>(fzf-maps-o)
 
 " Insert mode completion
 " imap <c-x><c-k> <plug>(fzf-complete-word)
@@ -454,9 +488,9 @@ autocmd! User GoyoLeave Limelight!
 " => Grepper
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " search in current dir
-nnoremap <leader>f :Grepper -tool pt <cr>
+" nnoremap <leader>f :Grepper -tool pt <cr>
 " search in current buffers
-nnoremap <leader>F :Grepper -tool pt -buffers <cr>
+" nnoremap <leader>F :Grepper -tool pt -buffers <cr>
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -475,3 +509,9 @@ func! CompileAndRun()
         exec "!time python %"
     endif
 endfunc
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => set path
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" let &path.="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"
