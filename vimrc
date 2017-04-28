@@ -1,4 +1,19 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Essential
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" vi noncompatible mode
+set nocompatible
+
+" open filetype detection
+filetype plugin indent on
+
+" backspace anything
+set backspace=indent,eol,start
+
+" UTF-8 support
+set encoding=utf-8
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => keymappings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " map <leader>, default is '\'
@@ -12,7 +27,7 @@ vnoremap <leader>y "+y
 nmap <leader>p "+p
 
 " 依次遍历
-nnoremap nw <c-w><c-w>
+" nnoremap nw <c-w><c-w>
 " 定义快捷键关闭当前分割窗口
 nmap <leader>q :q<CR>
 " 定义快捷键保存当前窗口内容
@@ -33,24 +48,88 @@ nnoremap [<space>  :<c-u>put! =repeat(nr2char(10), v:count1)<cr>'[
 nnoremap ]<space>  :<c-u>put =repeat(nr2char(10), v:count1)<cr>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Display
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" set color
+colorscheme Tomorrow-Night-Eighties
+set background=dark
+
+" Show my current position in the status bar
+set ruler
+
+" Show the keystrokes being entered in the screen
+set showcmd
+
+" Show the mode we're using if not normal mode (e.g. --INSERT--)
+set showmode
+
+" set 256 color
+set term=screen-256color
+
+" display status line
+set laststatus=2
+
+" display line number on current line and relativenumber on other lines
+set number
+set relativenumber
+
+" 高亮显示当前行/列
+" set cursorline
+" set cursorcolumn
+
+" highlight column 80
+set colorcolumn=80
+
+" Highlight while searching with / or ?
+set incsearch
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Coding
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" 禁止折行
+set nowrap
+
+" 开启语法高亮功能
+syntax enable
+" 允许用指定语法高亮配色方案替换默认方案
+syntax on
+
+" Replace tabs
+set expandtab
+" 设置编辑时制表符占用空格数
+set tabstop=4
+" 设置格式化时制表符占用空格数
+set shiftwidth=4
+" Tab key indents by 4 spaces
+set softtabstop=4
+
+" 缩进可视化插件 Indent Guides
+" 是否随vim 自启动
+let g:indent_guides_enable_on_vim_startup=0
+" 从第二层开始可视化显示缩进
+let g:indent_guides_start_level=2
+" 色块宽度
+let g:indent_guides_guide_size=1
+" 快捷键 i 开/关缩进可视化
+nnoremap <silent> <leader>i <Plug>IndentGuidesToggle
+
+" 基于缩进或语法进行代码折叠
+" set foldmethod=indent
+" set foldmethod=syntax
+
+" 启动 vim 时关闭折叠代码
+set nofoldenable
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => others
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" " 根据侦测到的不同类型加载对应的插件
-filetype plugin indent on
-
 " 搜索时大小写不敏感
 set ignorecase
 " 但当输入大写字符时只匹配大写
 set smartcase
 
-" use vim default instead of vi default
-set nocompatible
-
 " vim 自身命令行模式智能补全
 set wildmenu
-
-" UTF-8 support
-set encoding=utf-8
 
 " enable mouse support
 set mouse=a
@@ -60,9 +139,6 @@ set mouse=a
 if $TMUX == ''
     set clipboard+=unnamed
 endif
-
-" set backspace
-set backspace=indent,eol,start
 
 " Prevents inserting two spaces after punctuation on a join (J)
 set nojoinspaces
@@ -90,6 +166,10 @@ endif
 
 " source vimrc on saving
 " autocmd BufWritePost $MYVIMRC source $MYVIMRC
+
+" Improve redrawing smoothness by assuming that my terminal is reasonably
+" fast
+set ttyfast
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugins
@@ -132,6 +212,8 @@ call plug#begin('~/.vim/bundle')
     Plug 'nathanaelkane/vim-indent-guides'
     Plug 'vim-airline/vim-airline'
     Plug 'vim-airline/vim-airline-themes'
+        let g:airline_powerline_fonts = 1
+        let g:airline_theme = "tomorrow"
     Plug 'junegunn/goyo.vim', { 'on': 'Goyo' }
     Plug 'junegunn/limelight.vim', { 'on': 'Limelight' }
     Plug 'mhinz/vim-startify'
@@ -166,7 +248,7 @@ call plug#begin('~/.vim/bundle')
     Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
     Plug 'ctrlpvim/ctrlp.vim'
     Plug 'fholgado/minibufexpl.vim'
-    " Plug 'junegunn/fzf', { 'dir': '/usr/local/opt/fzf', 'do': './install --all' }
+    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 
     " code search
     Plug 'dyng/ctrlsf.vim'
@@ -189,100 +271,6 @@ call plug#begin('~/.vim/bundle')
 call plug#end()
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Colors
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" set color
-colorscheme Tomorrow-Night-Eighties
-set background=dark
-" colorscheme Tomorrow-Night
-" colorscheme solarized
-" colorscheme molokai
-
-if has('gui_running')
-    set guifont=Source\ Code\ Pro\ for\ Powerline:h14
-endif
-
-" vim-airline
-set laststatus=2
-let g:airline_powerline_fonts = 1
-" let g:airline_solarized_bg = "dark"
-" let g:airline_theme = "solarized"
-let g:airline_theme = "tomorrow"
-" display the status of AsyncRun
-" let g:airline_section_error = airline#section#create_right(['%{g:asyncrun_status}'])
-
-
-" set 256 color
-set term=screen-256color
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Displays
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 总是显示状态栏
-set laststatus=2
-
-" 显示光标当前位置
-set ruler
-
-" 开启行号显示
-set number
-set relativenumber
-
-" 高亮显示当前行/列
-set cursorline
-set cursorcolumn
-
-" 显示 80  列位置
-set colorcolumn=80
-
-" 高亮显示搜索结果
-" set hlsearch
-" Highlight while searching with / or ?
-set incsearch
-
-" Show current mode in command-line
-set showmode
-" Show already typed keys when more are expected
-set showcmd
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Coding
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 禁止折行
-set nowrap
-
-" 开启语法高亮功能
-syntax enable
-" 允许用指定语法高亮配色方案替换默认方案
-syntax on
-
-" 将制表符扩展为空格
-set expandtab
-" 设置编辑时制表符占用空格数
-set tabstop=4
-" 设置格式化时制表符占用空格数
-set shiftwidth=4
-" Tab key indents by 4 spaces
-set softtabstop=4
-
-" 缩进可视化插件 Indent Guides
-" 是否随vim 自启动
-let g:indent_guides_enable_on_vim_startup=0
-" 从第二层开始可视化显示缩进
-let g:indent_guides_start_level=2
-" 色块宽度
-let g:indent_guides_guide_size=1
-" 快捷键 i 开/关缩进可视化
-nnoremap <silent> <leader>i <Plug>IndentGuidesToggle
-
-" 基于缩进或语法进行代码折叠
-" set foldmethod=indent
-" set foldmethod=syntax
-
-" 启动 vim 时关闭折叠代码
-set nofoldenable
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Customizations about Python
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " autorun python
@@ -296,6 +284,9 @@ autocmd FileType python nnoremap <leader>ya :0,$!yapf<Cr><C-o>
 
 " add breakpoint
 autocmd FileType python nnoremap <leader>bk :normal Oimport ipdb; ipdb.set_trace()<ESC>j
+
+" Turn on Python syntax highlighting for all syntax types
+let python_highlight_all=1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Customizations about c++
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -367,7 +358,8 @@ let g:ycm_server_keep_logfiles = 1
 let g:ycm_server_log_level = 'debug'
 
 " 设置 python 路径
-let g:ycm_python_binary_path = 'python'
+" let g:ycm_python_binary_path = 'python'
+let g:ycm_python_binary_path = '/Users/alan/anaconda3/envs/deeplearning/bin/python'
 " 设置运行 ycm_server 的 python 路径
 let g:ycm_server_python_interpreter = '/Users/alan/anaconda3/bin/python'
 
