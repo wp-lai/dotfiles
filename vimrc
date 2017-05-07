@@ -32,18 +32,6 @@ nmap <leader>e :wq<CR>
 " enable undo C-u
 inoremap <C-U> <C-G>u<C-U>
 
-" quickly move current line up or down
-nnoremap [e  :<c-u>execute 'move -1-'. v:count1<cr>
-nnoremap ]e  :<c-u>execute 'move +'. v:count1<cr>
-
-" quickly add empty lines
-nnoremap [<space>  :<c-u>put! =repeat(nr2char(10), v:count1)<cr>'[
-nnoremap ]<space>  :<c-u>put =repeat(nr2char(10), v:count1)<cr>
-
-" navigate tabs
-nnoremap ]b :bnext<cr>
-nnoremap [b :bprev<cr>
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Display
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -62,6 +50,7 @@ set showmode
 
 " set 256 color
 set term=screen-256color
+set t_Co=256
 
 " display status line
 set laststatus=2
@@ -83,13 +72,12 @@ set incsearch
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Coding
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 禁止折行
 set nowrap
 
 syntax enable
 syntax on
 
-" Replace tabs
+" tabs settings
 set expandtab
 set tabstop=4
 set shiftwidth=4
@@ -100,6 +88,8 @@ set softtabstop=4
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ignore case when searching
 set ignorecase
+
+set infercase
 
 " Don't ignore case when search has capital letter
 set smartcase
@@ -113,16 +103,14 @@ set mouse=a
 " Delete comment character when joining commented lines
 set formatoptions+=j
 
-" enable matchit functionality
-if !exists('g:loaded_matchit')
-  runtime macros/matchit.vim
-endif
+" increase command history
+set history=200
 
-" copy paste to clipboard
-" " not applied in tmux
-" if $TMUX == ''
-"     set clipboard+=unnamed
-" endif
+" Allow buffer switching without saving"
+set hidden
+
+" enable matchit functionality
+runtime macros/matchit.vim
 
 " Prevents inserting two spaces after punctuation on a join (J)
 set nojoinspaces
@@ -131,8 +119,12 @@ set nojoinspaces
 set showmatch
 
 " more natural split opening
-" set splitbelow
+set splitbelow
 set splitright
+
+" Fix the & command
+nnoremap & :&&<CR>
+xnoremap & :&&<CR>
 
 " edit crontab in Mac
 autocmd FileType crontab setlocal nowritebackup
@@ -142,9 +134,6 @@ autocmd BufReadPost *
     \ if line("'\"") > 1 && line("'\"") <= line("$") |
     \   exe "normal! g`\"" |
     \ endif "`'")"'")
-
-" source vimrc on saving
-" autocmd BufWritePost $MYVIMRC source $MYVIMRC
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugins
@@ -165,6 +154,8 @@ call plug#begin('~/.vim/bundle')
         let g:ale_lint_on_save = 1
         let g:ale_lint_on_text_changed = 0
         let g:ale_lint_on_enter = 0
+        let g:ale_open_list = 1
+        let g:ale_keep_list_window_open = 0
         let g:ale_linters = {
         \   'python': ['flake8'],
         \}
@@ -187,10 +178,13 @@ call plug#begin('~/.vim/bundle')
         nnoremap <leader>jh :YcmCompleter GetDoc<CR>
 
     Plug 'majutsushi/tagbar'
-        let tagbar_left=0
         nmap <leader>tt :TagbarToggle<CR>
+        let tagbar_left=0
         let tagbar_width=32
         let g:tagbar_compact=1
+
+    Plug 'skywind3000/asyncrun.vim'
+        autocmd User AsyncRunStart call asyncrun#quickfix_toggle(15, 1)
 
     " python
     Plug 'nvie/vim-flake8', { 'for': 'python' }
@@ -199,7 +193,7 @@ call plug#begin('~/.vim/bundle')
     " cpp
     Plug 'octol/vim-cpp-enhanced-highlight', { 'for': 'cpp' }
     Plug 'derekwyatt/vim-fswitch', { 'for': ['c', 'cpp'] }
-        nmap <silent> <leader>sw :FSHere<cr>
+        nmap <silent> <leader>sw :FSHere<CR>
         let b:fswitchdst  = 'cpp, h'
     Plug 'derekwyatt/vim-protodef', { 'for': 'cpp' }
     Plug 'rhysd/vim-clang-format', { 'for': ['c', 'cpp'] }
@@ -208,11 +202,17 @@ call plug#begin('~/.vim/bundle')
                     \ "AllowShortIfStatementsOnASingleLine" : "true",
                     \ "AlwaysBreakTemplateDeclarations" : "true",
                     \ "Standard" : "C++11"}
-        autocmd FileType c,cpp nnoremap <buffer><leader>cf :<C-u>ClangFormat<CR>
-        autocmd FileType c,cpp vnoremap <buffer><leader>cf :ClangFormat<CR>
+        autocmd FileType c,cpp nnoremap <buffer><leader>= :<C-u>ClangFormat<CR>
+        autocmd FileType c,cpp vnoremap <buffer><leader>= :ClangFormat<CR>
+
+    " golang
+    Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
+        autocmd FileType go nnoremap <F9> :GoRun<CR>
 
     " style
-    Plug 'flazz/vim-colorschemes'
+    " Plug 'flazz/vim-colorschemes'
+    " Plug 'junegunn/seoul256.vim'
+    Plug 'lifepillar/vim-solarized8'
     Plug 'nathanaelkane/vim-indent-guides'
         let g:indent_guides_enable_on_vim_startup=0
         let g:indent_guides_start_level=2
@@ -223,7 +223,7 @@ call plug#begin('~/.vim/bundle')
         let g:airline_theme = "tomorrow"
     Plug 'junegunn/limelight.vim', { 'on': 'Limelight' }
     Plug 'junegunn/goyo.vim', { 'on': 'Goyo' }
-        nnoremap <silent> <leader>z :Goyo<cr>
+        nnoremap <silent> <leader>z :Goyo<CR>
         autocmd! User GoyoEnter Limelight
         autocmd! User GoyoLeave Limelight!
     Plug 'mhinz/vim-startify'
@@ -234,8 +234,10 @@ call plug#begin('~/.vim/bundle')
     Plug 'jiangmiao/auto-pairs'
     Plug 'vim-voom/VOoM'
     Plug 'tpope/vim-repeat'
+    Plug 'tpope/vim-unimpaired'
 
-    " search and replace
+    " search
+    Plug 'google/vim-searchindex'
     Plug 'mileszs/ack.vim'
         nnoremap <C-f> :Ack<SPACE>
         if executable('ag')
@@ -257,16 +259,20 @@ call plug#begin('~/.vim/bundle')
         let NERDTreeMinimalUI=1
         let NERDTreeAutoDeleteBuffer=1
         let NERDTreeIgnore=['\.pyc','\.swp']
-    Plug 'ctrlpvim/ctrlp.vim'
-        let g:ctrlp_use_caching = 0
-        if executable('ag')
-            set grepprg=ag\ --nogroup\ --nocolor
-            let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-        endif
     Plug 'jlanzarotta/bufexplorer'
         let g:bufExplorerShowRelativePath=1
-        nmap <leader>o :BufExplorer<cr>
-    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+        nmap <leader>o :BufExplorer<CR>
+    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all'  }
+    Plug 'junegunn/fzf.vim'
+        nnoremap <C-p> :FZF<CR>
+        nnoremap <leader>bb :Buffers<CR>
+        nmap <leader><tab> <plug>(fzf-maps-n)
+        xmap <leader><tab> <plug>(fzf-maps-x)
+        omap <leader><tab> <plug>(fzf-maps-o)
+        " imap <c-x><c-k> <plug>(fzf-complete-word)
+        imap <c-x><c-f> <plug>(fzf-complete-path)
+        " imap <c-x><c-j> <plug>(fzf-complete-file-ag)
+        imap <c-x><c-l> <plug>(fzf-complete-line)
 
     " git
     Plug 'tpope/vim-fugitive'
@@ -280,45 +286,60 @@ call plug#begin('~/.vim/bundle')
     Plug 'christoomey/vim-tmux-navigator'
         let g:tmux_navigator_no_mappings = 1
 
-        nnoremap <silent> <C-h> :TmuxNavigateLeft<cr>
-        nnoremap <silent> <C-j> :TmuxNavigateDown<cr>
-        nnoremap <silent> <C-k> :TmuxNavigateUp<cr>
-        nnoremap <silent> <C-l> :TmuxNavigateRight<cr>
-        nnoremap <silent> <C-/> :TmuxNavigatePrevious<cr>
+        nnoremap <silent> <C-h> :TmuxNavigateLeft<CR>
+        nnoremap <silent> <C-j> :TmuxNavigateDown<CR>
+        nnoremap <silent> <C-k> :TmuxNavigateUp<CR>
+        nnoremap <silent> <C-l> :TmuxNavigateRight<CR>
+        nnoremap <silent> <C-/> :TmuxNavigatePrevious<CR>
 
     " see registor contents
     Plug 'junegunn/vim-peekaboo'
+
+    " markdown
+    Plug 'godlygeek/tabular'
+    Plug 'plasticboy/vim-markdown'
 call plug#end()
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Customizations about Python
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" pep8 style
+autocmd FileType python setlocal ts=4 sts=4 sw=4 et
+let python_highlight_all=1
+
 " add matching pairs
 autocmd FileType python let b:match_words = '\<if\>:\<elif\>:\<else\>'
 
 " run yapf formater
-autocmd FileType python nnoremap <leader>ya :0,$!yapf<Cr><C-o>
+autocmd FileType python nnoremap <leader>= :0,$!yapf<CR><C-o>
 
 " add breakpoint
 autocmd FileType python nnoremap <leader>bk :normal Oimport ipdb; ipdb.set_trace()<ESC>j
 
-" Turn on Python syntax highlighting for all syntax types
-let python_highlight_all=1
+" enable using `gf` to search module
+autocmd FileType python setlocal path+=/Users/alan/anaconda3/lib/python3.6,/Users/alan/anaconda3/lib/python3.6/site-packages
+
+" use make to run python
+autocmd FileType python setlocal makeprg=python\ %
+autocmd FileType python compiler pyunit
+
+" run python
+autocmd FileType python nnoremap <F9> :!python %<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Auto Run
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-nnoremap <F9> :call CompileAndRun()<CR>
-func! CompileAndRun()
+autocmd FileType c,cpp nnoremap <F9> :call CompileAndRun()<CR>
+function! CompileAndRun()
     exec "w"
-    if &filetype == 'c'
-        exec "!clang % -o %<"
-        exec "!time ./%<"
-    elseif &filetype == 'cpp'
-        exec "!clang++ -std=c++1y % -o %<"
-        exec "!time ./%<"
-    elseif &filetype == 'python'
-        exec "!time python %"
+    if (&filetype == 'c')
+        exec "AsyncRun clang % -o %< && ./%<"
+    elseif (&filetype == 'cpp')
+        exec "AsyncRun clang++ -std=c++1y % -o %< && ./%<"
+    " elseif (&filetype == 'python')
+    "     exec "AsyncRun python %"
+    " elseif (&filetype == 'go')
+    "     exec "GoRun"
     endif
-endfunc
+endfunction
 
