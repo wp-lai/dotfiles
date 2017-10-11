@@ -32,6 +32,9 @@ nmap <leader>e :wq<CR>
 " enable undo C-u
 inoremap <C-U> <C-G>u<C-U>
 
+" quick close quickfix window
+nnoremap <leader>a :cclose<CR>
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Display
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -122,6 +125,13 @@ set showmatch
 set splitbelow
 set splitright
 
+"refresh vimrc after saving
+autocmd BufWritePost ~/.vimrc source %
+autocmd BufWritePost ~/.vim/vimrc source %
+
+" use w!! to save files with sudo
+cmap w!! w !sudo tee > /dev/null %
+
 " Fix the & command
 nnoremap & :&&<CR>
 xnoremap & :&&<CR>
@@ -167,15 +177,15 @@ call plug#begin('~/.vim/bundle')
         let g:ycm_autoclose_preview_window_after_insertion = 1
         let g:ycm_autoclose_preview_window_after_completion = 1
         let g:ycm_goto_buffer_command = 'vertical-split'
-        let g:ycm_confirm_extra_conf = 0
         let g:ycm_python_binary_path = 'python'
         " let g:ycm_server_python_interpreter = ''
+        let g:ycm_confirm_extra_conf = 0
         let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
-        nnoremap <leader>dc :YcmCompleter GoToDeclaration<CR>
-        nnoremap <leader>df :YcmCompleter GoToDefinition<CR>
-        nnoremap <leader>ji :YcmCompleter GoToInclude<CR>
-        nnoremap <leader>jj :YcmCompleter GoToImprecise<CR>
-        nnoremap <leader>jh :YcmCompleter GetDoc<CR>
+        " nnoremap <leader>dc :YcmCompleter GoToDeclaration<CR>
+        " nnoremap <leader>df :YcmCompleter GoToDefinition<CR>
+        " nnoremap <leader>ji :YcmCompleter GoToInclude<CR>
+        " nnoremap <leader>jj :YcmCompleter GoToImprecise<CR>
+        " nnoremap <leader>jh :YcmCompleter GetDoc<CR>
 
     Plug 'majutsushi/tagbar'
         nmap <leader>tt :TagbarToggle<CR>
@@ -206,21 +216,38 @@ call plug#begin('~/.vim/bundle')
         autocmd FileType c,cpp vnoremap <buffer><leader>= :ClangFormat<CR>
 
     " golang
-    Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
-        autocmd FileType go nnoremap <F9> :GoRun<CR>
+    Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries', 'for': 'go' }
+        let g:go_def_mode = 'godef'
+        " au FileType go nmap <Leader>s <Plug>(go-implements)
+        " au FileType go nmap <Leader>i <Plug>(go-info)
+        " au FileType go nmap <Leader>c <Plug>(go-rename)
+        au FileType go nmap <leader>g :GoDef<CR>
+        au FileType go nmap <leader>i :GoImport 
+        au FileType go nmap <leader>r <Plug>(go-run)
+        " au FileType go nmap <leader>b <Plug>(go-build)
+        au FileType go nmap <leader>t <Plug>(go-test)
+        " au FileType go nmap <Leader>gd <Plug>(go-doc)
+        au FileType go nmap <Leader>d <Plug>(go-doc-vertical)
+        " au FileType go nmap <leader>co <Plug>(go-coverage)
+    Plug 'tweekmonster/hl-goimport.vim', { 'for': 'go' }
 
     " style
     " Plug 'flazz/vim-colorschemes'
     " Plug 'junegunn/seoul256.vim'
     Plug 'lifepillar/vim-solarized8'
-    Plug 'nathanaelkane/vim-indent-guides'
-        let g:indent_guides_enable_on_vim_startup=0
-        let g:indent_guides_start_level=2
-        let g:indent_guides_guide_size=1
-    Plug 'vim-airline/vim-airline'
-    Plug 'vim-airline/vim-airline-themes'
-        let g:airline_powerline_fonts = 1
-        let g:airline_theme = "tomorrow"
+    " Plug 'nathanaelkane/vim-indent-guides'
+    "     let g:indent_guides_enable_on_vim_startup=0
+    "     let g:indent_guides_start_level=2
+    "     let g:indent_guides_guide_size=1
+
+    " Plug 'vim-airline/vim-airline'
+    " Plug 'vim-airline/vim-airline-themes'
+    "     let g:airline_powerline_fonts = 1
+    "     let g:airline_theme = "bubblegum"
+    Plug 'itchyny/lightline.vim'
+        let g:lightline = {
+              \ 'colorscheme': 'seoul256',
+              \ }
     Plug 'junegunn/limelight.vim', { 'on': 'Limelight' }
     Plug 'junegunn/goyo.vim', { 'on': 'Goyo' }
         nnoremap <silent> <leader>z :Goyo<CR>
@@ -262,7 +289,7 @@ call plug#begin('~/.vim/bundle')
     Plug 'jlanzarotta/bufexplorer'
         let g:bufExplorerShowRelativePath=1
         nmap <leader>o :BufExplorer<CR>
-    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all'  }
+    Plug 'junegunn/fzf', { 'on': 'FZF', 'dir': '~/.fzf', 'do': './install --all'  }
     Plug 'junegunn/fzf.vim'
         nnoremap <C-p> :FZF<CR>
         nnoremap <leader>bb :Buffers<CR>
@@ -304,7 +331,7 @@ call plug#end()
 " => Customizations about Python
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " pep8 style
-autocmd FileType python setlocal ts=4 sts=4 sw=4 et
+autocmd FileType python setlocal ts=4 sts=4 sw=4 et colorcolumn=80
 let python_highlight_all=1
 
 " add matching pairs
