@@ -184,8 +184,14 @@ call plug#begin('~/.vim/bundle')
         " nnoremap <leader>dc :YcmCompleter GoToDeclaration<CR>
         " nnoremap <leader>df :YcmCompleter GoToDefinition<CR>
         " nnoremap <leader>ji :YcmCompleter GoToInclude<CR>
-        " nnoremap <leader>jj :YcmCompleter GoToImprecise<CR>
+        nnoremap <leader>jj :YcmCompleter GoToImprecise<CR>
         " nnoremap <leader>jh :YcmCompleter GetDoc<CR>
+
+        " triggers for html and css
+        let g:ycm_semantic_triggers = {
+            \   'css': [ 're!^\s{4}', 're!:\s+'],
+            \   'html': [ '</' ],
+            \ }
 
     Plug 'majutsushi/tagbar'
         nmap <leader>tt :TagbarToggle<CR>
@@ -222,14 +228,19 @@ call plug#begin('~/.vim/bundle')
         " au FileType go nmap <Leader>i <Plug>(go-info)
         " au FileType go nmap <Leader>c <Plug>(go-rename)
         au FileType go nmap <leader>g :GoDef<CR>
-        au FileType go nmap <leader>i :GoImport 
+        au FileType go nmap <leader>i :GoImports<CR>
         au FileType go nmap <leader>r <Plug>(go-run)
         " au FileType go nmap <leader>b <Plug>(go-build)
-        au FileType go nmap <leader>t <Plug>(go-test)
+        au FileType go nmap <leader>te <Plug>(go-test)
         " au FileType go nmap <Leader>gd <Plug>(go-doc)
         au FileType go nmap <Leader>d <Plug>(go-doc-vertical)
         " au FileType go nmap <leader>co <Plug>(go-coverage)
     Plug 'tweekmonster/hl-goimport.vim', { 'for': 'go' }
+
+    " html
+    Plug 'mattn/emmet-vim'
+        let g:user_emmet_install_global = 0
+        autocmd FileType html,css EmmetInstall
 
     " style
     " Plug 'flazz/vim-colorschemes'
