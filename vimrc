@@ -33,7 +33,7 @@ nmap <leader>e :wq<CR>
 inoremap <C-U> <C-G>u<C-U>
 
 " quick close quickfix window
-nnoremap <leader>a :cclose<CR>
+nnoremap <leader>a :cclose<CR>:lclose<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Display
@@ -171,12 +171,12 @@ call plug#begin('~/.vim/bundle')
         \}
 
     " code completion
-    Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
+    Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --go-completer' }
         " do not insert until we choose one
         set completeopt+=noselect
         let g:ycm_autoclose_preview_window_after_insertion = 1
         let g:ycm_autoclose_preview_window_after_completion = 1
-        let g:ycm_goto_buffer_command = 'vertical-split'
+        " let g:ycm_goto_buffer_command = 'vertical-split'
         let g:ycm_python_binary_path = 'python'
         " let g:ycm_server_python_interpreter = ''
         let g:ycm_confirm_extra_conf = 0
@@ -184,7 +184,7 @@ call plug#begin('~/.vim/bundle')
         " nnoremap <leader>dc :YcmCompleter GoToDeclaration<CR>
         " nnoremap <leader>df :YcmCompleter GoToDefinition<CR>
         " nnoremap <leader>ji :YcmCompleter GoToInclude<CR>
-        nnoremap <leader>jj :YcmCompleter GoToImprecise<CR>
+        nnoremap <leader>j :YcmCompleter GoTo<CR>
         " nnoremap <leader>jh :YcmCompleter GetDoc<CR>
 
         " triggers for html and css
@@ -193,23 +193,24 @@ call plug#begin('~/.vim/bundle')
             \   'html': [ '</' ],
             \ }
 
-    Plug 'majutsushi/tagbar'
-        nmap <leader>tt :TagbarToggle<CR>
-        let tagbar_left=0
-        let tagbar_width=32
-        let g:tagbar_compact=1
+    " Plug 'majutsushi/tagbar'
+    "     nmap <leader>tt :TagbarToggle<CR>
+    "     let tagbar_left=0
+    "     let tagbar_width=32
+    "     let g:tagbar_compact=1
 
     Plug 'skywind3000/asyncrun.vim'
         autocmd User AsyncRunStart call asyncrun#quickfix_toggle(15, 1)
 
     " python
+    autocmd FileType python nnoremap K :YcmCompleter GetDoc<CR>
     Plug 'nvie/vim-flake8', { 'for': 'python' }
     Plug 'bps/vim-textobj-python', { 'for': 'python' }
 
     " cpp
     Plug 'octol/vim-cpp-enhanced-highlight', { 'for': 'cpp' }
     Plug 'derekwyatt/vim-fswitch', { 'for': ['c', 'cpp'] }
-        nmap <silent> <leader>sw :FSHere<CR>
+        autocmd FileType c,cpp nmap <silent> <leader>sw :FSHere<CR>
         let b:fswitchdst  = 'cpp, h'
     Plug 'derekwyatt/vim-protodef', { 'for': 'cpp' }
     Plug 'rhysd/vim-clang-format', { 'for': ['c', 'cpp'] }
@@ -222,18 +223,27 @@ call plug#begin('~/.vim/bundle')
         autocmd FileType c,cpp vnoremap <buffer><leader>= :ClangFormat<CR>
 
     " golang
+    autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=4 shiftwidth=4
     Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries', 'for': 'go' }
+        " let g:go_highlight_types = 1
+        " let g:go_highlight_fields = 1
+        " let g:go_highlight_functions = 1
+        " let g:go_highlight_methods = 1
+        " let g:go_highlight_build_constraints = 1
         let g:go_def_mode = 'godef'
+        " let g:go_auto_type_info = 1
+        " let g:go_auto_sameids = 1
         " au FileType go nmap <Leader>s <Plug>(go-implements)
         " au FileType go nmap <Leader>i <Plug>(go-info)
         " au FileType go nmap <Leader>c <Plug>(go-rename)
-        au FileType go nmap <leader>g :GoDef<CR>
+        " au FileType go nmap gd :GoDef<CR>
         au FileType go nmap <leader>i :GoImports<CR>
         au FileType go nmap <leader>r <Plug>(go-run)
-        " au FileType go nmap <leader>b <Plug>(go-build)
-        au FileType go nmap <leader>te <Plug>(go-test)
+        au FileType go nmap <leader>b <Plug>(go-build)
+        au FileType go nmap <leader>t <Plug>(go-test)
+        au FileType go nmap <C-f> :GoDeclsDir<CR>
         " au FileType go nmap <Leader>gd <Plug>(go-doc)
-        au FileType go nmap <Leader>d <Plug>(go-doc-vertical)
+        " au FileType go nmap K<Plug>(go-doc-vertical)
         " au FileType go nmap <leader>co <Plug>(go-coverage)
     Plug 'tweekmonster/hl-goimport.vim', { 'for': 'go' }
 
@@ -245,7 +255,8 @@ call plug#begin('~/.vim/bundle')
     " style
     " Plug 'flazz/vim-colorschemes'
     " Plug 'junegunn/seoul256.vim'
-    Plug 'lifepillar/vim-solarized8'
+    " Plug 'lifepillar/vim-solarized8'
+    Plug 'chriskempson/vim-tomorrow-theme'
     " Plug 'nathanaelkane/vim-indent-guides'
     "     let g:indent_guides_enable_on_vim_startup=0
     "     let g:indent_guides_start_level=2
@@ -270,7 +281,6 @@ call plug#begin('~/.vim/bundle')
     Plug 'bronson/vim-trailing-whitespace'
     Plug 'tpope/vim-surround'
     Plug 'jiangmiao/auto-pairs'
-    Plug 'vim-voom/VOoM'
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-unimpaired'
 
@@ -297,13 +307,13 @@ call plug#begin('~/.vim/bundle')
         let NERDTreeMinimalUI=1
         let NERDTreeAutoDeleteBuffer=1
         let NERDTreeIgnore=['\.pyc','\.swp']
-    Plug 'jlanzarotta/bufexplorer'
-        let g:bufExplorerShowRelativePath=1
-        nmap <leader>o :BufExplorer<CR>
-    Plug 'junegunn/fzf', { 'on': 'FZF', 'dir': '~/.fzf', 'do': './install --all'  }
+    " Plug 'jlanzarotta/bufexplorer'
+    "     let g:bufExplorerShowRelativePath=1
+    "     nmap <leader>o :BufExplorer<CR>
+    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
     Plug 'junegunn/fzf.vim'
         nnoremap <C-p> :FZF<CR>
-        nnoremap <leader>bb :Buffers<CR>
+        " nnoremap <leader>bb :Buffers<CR>
         nmap <leader><tab> <plug>(fzf-maps-n)
         xmap <leader><tab> <plug>(fzf-maps-x)
         omap <leader><tab> <plug>(fzf-maps-o)
