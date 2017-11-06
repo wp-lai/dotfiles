@@ -11,7 +11,7 @@ filetype plugin indent on
 set backspace=indent,eol,start
 
 " UTF-8 support
-set encoding=utf-8
+set encoding=utf8
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => keymappings
@@ -39,8 +39,10 @@ nnoremap <leader>a :cclose<CR>:lclose<CR>
 " => Display
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " set color
-colorscheme Tomorrow-Night-Eighties
+" colorscheme Tomorrow-Night-Eighties
 set background=dark
+colorscheme gruvbox
+hi LineNr ctermfg=237
 
 " Show my current position in the status bar
 set ruler
@@ -207,6 +209,9 @@ call plug#begin('~/.vim/bundle')
     Plug 'nvie/vim-flake8', { 'for': 'python' }
     Plug 'bps/vim-textobj-python', { 'for': 'python' }
 
+    " c
+    Plug 'vim-utils/vim-man', { 'on': 'Man' }
+
     " cpp
     Plug 'octol/vim-cpp-enhanced-highlight', { 'for': 'cpp' }
     Plug 'derekwyatt/vim-fswitch', { 'for': ['c', 'cpp'] }
@@ -256,7 +261,14 @@ call plug#begin('~/.vim/bundle')
     " Plug 'flazz/vim-colorschemes'
     " Plug 'junegunn/seoul256.vim'
     " Plug 'lifepillar/vim-solarized8'
-    Plug 'chriskempson/vim-tomorrow-theme'
+    " Plug 'chriskempson/vim-tomorrow-theme'
+    Plug 'morhetz/gruvbox', { 'do': 'cp ~/.vim/bundle/gruvbox/colors/gruvbox.vim ~/.vim/colors/' }
+    " Plug 'chriskempson/base16-vim'
+    "     let g:base16_shell_path="~/.config/base16-shell/scripts"
+    "     if filereadable(expand("~/.vimrc_background"))
+    "       let base16colorspace=256
+    "       source ~/.vimrc_background
+    "     endif
     " Plug 'nathanaelkane/vim-indent-guides'
     "     let g:indent_guides_enable_on_vim_startup=0
     "     let g:indent_guides_start_level=2
@@ -266,6 +278,7 @@ call plug#begin('~/.vim/bundle')
     " Plug 'vim-airline/vim-airline-themes'
     "     let g:airline_powerline_fonts = 1
     "     let g:airline_theme = "bubblegum"
+
     Plug 'itchyny/lightline.vim'
         let g:lightline = {
               \ 'colorscheme': 'seoul256',
@@ -276,6 +289,9 @@ call plug#begin('~/.vim/bundle')
         autocmd! User GoyoEnter Limelight
         autocmd! User GoyoLeave Limelight!
     Plug 'mhinz/vim-startify'
+    Plug 'ryanoasis/vim-devicons'
+        set guifont=Source\ Code\ Pro\ Nerd\ Font\ Complete\ Mono:h12
+
 
     " utilities
     Plug 'bronson/vim-trailing-whitespace'
@@ -333,7 +349,6 @@ call plug#begin('~/.vim/bundle')
     " tmux
     Plug 'christoomey/vim-tmux-navigator'
         let g:tmux_navigator_no_mappings = 1
-
         nnoremap <silent> <C-h> :TmuxNavigateLeft<CR>
         nnoremap <silent> <C-j> :TmuxNavigateDown<CR>
         nnoremap <silent> <C-k> :TmuxNavigateUp<CR>
@@ -372,12 +387,12 @@ autocmd FileType python setlocal makeprg=python\ %
 autocmd FileType python compiler pyunit
 
 " run python
-autocmd FileType python nnoremap <F9> :!python %<CR>
+autocmd FileType python nnoremap <leader>r :!python %<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Auto Run
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-autocmd FileType c,cpp nnoremap <F9> :call CompileAndRun()<CR>
+autocmd FileType c,cpp nnoremap <leader>r :call CompileAndRun()<CR>
 function! CompileAndRun()
     exec "w"
     if (&filetype == 'c')
