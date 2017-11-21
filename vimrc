@@ -14,7 +14,7 @@ set backspace=indent,eol,start
 set encoding=utf8
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => keymappings
+" => Keymappings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " map space to leader
 map <Space> <leader>
@@ -32,17 +32,26 @@ nmap <leader>e :wq<CR>
 " enable undo C-u
 inoremap <C-U> <C-G>u<C-U>
 
-" quick close quickfix window
+" quick close quickfix & location list window
 nnoremap <leader>a :cclose<CR>:lclose<CR>
+
+" use w!! to save files with sudo
+cmap w!! w !sudo tee > /dev/null %
+
+" Fix the & command (repeat last substitute)
+nnoremap & :&&<CR>
+xnoremap & :&&<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Display
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " set color
-" colorscheme Tomorrow-Night-Eighties
 set background=dark
+" colorscheme Tomorrow-Night-Eighties
 colorscheme gruvbox
-hi LineNr ctermfg=237
+
+" display status line
+" set laststatus=2
 
 " Show my current position in the status bar
 set ruler
@@ -53,15 +62,7 @@ set showcmd
 " Show the mode we're using if not normal mode (e.g. --INSERT--)
 set showmode
 
-" set 256 color
-set term=screen-256color
-set t_Co=256
-
-" display status line
-set laststatus=2
-
 " display line number on current line and relativenumber on other lines
-set number
 set relativenumber
 
 " highlight current position
@@ -71,8 +72,10 @@ set relativenumber
 " highlight column 80
 set colorcolumn=80
 
-" Highlight while searching with / or ?
-set incsearch
+" support 256 colors
+if !has('gui_running')
+  set t_Co=256
+endif
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Coding
@@ -89,21 +92,31 @@ set shiftwidth=4
 set softtabstop=4
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => others
+" => Search
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ignore case when searching
 set ignorecase
 
+" adjust depend on the case
 set infercase
+
+" Highlight while searching with / or ?
+set incsearch
 
 " Don't ignore case when search has capital letter
 set smartcase
 
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Others
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Autocomplete commands using nice menu in place of window status
 set wildmenu
 
 " Enable mouse for scrolling and window resizing.
 set mouse=a
+
+" Prevents inserting two spaces after punctuation on a join (J)
+set nojoinspaces
 
 " Delete comment character when joining commented lines
 set formatoptions+=j
@@ -117,35 +130,12 @@ set hidden
 " enable matchit functionality
 runtime macros/matchit.vim
 
-" Prevents inserting two spaces after punctuation on a join (J)
-set nojoinspaces
-
 " show matching brakets/parenthesis
 set showmatch
 
 " more natural split opening
 set splitbelow
 set splitright
-
-"refresh vimrc after saving
-autocmd BufWritePost ~/.vimrc source %
-autocmd BufWritePost ~/.vim/vimrc source %
-
-" use w!! to save files with sudo
-cmap w!! w !sudo tee > /dev/null %
-
-" Fix the & command
-nnoremap & :&&<CR>
-xnoremap & :&&<CR>
-
-" edit crontab in Mac
-autocmd FileType crontab setlocal nowritebackup
-
-" restore cursor position when opening file
-autocmd BufReadPost *
-    \ if line("'\"") > 1 && line("'\"") <= line("$") |
-    \   exe "normal! g`\"" |
-    \ endif "`'")"'")
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugins
@@ -158,9 +148,6 @@ if empty(glob('~/.vim/autoload/plug.vim'))
 endif
 
 call plug#begin('~/.vim/bundle')
-    " user textobj
-    Plug 'kana/vim-textobj-user'
-
     " lint
     Plug 'w0rp/ale'
         let g:ale_lint_on_save = 1
@@ -171,6 +158,9 @@ call plug#begin('~/.vim/bundle')
         let g:ale_linters = {
         \   'python': ['flake8'],
         \}
+
+    " syntax highlight
+    Plug 'sheerun/vim-polyglot'
 
     " code completion
     Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --go-completer' }
@@ -183,7 +173,7 @@ call plug#begin('~/.vim/bundle')
         " let g:ycm_server_python_interpreter = ''
         let g:ycm_confirm_extra_conf = 0
         let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
-        " nnoremap <leader>dc :YcmCompleter GoToDeclaration<CR>
+        nnoremap gd :YcmCompleter GoToDeclaration<CR>
         " nnoremap <leader>df :YcmCompleter GoToDefinition<CR>
         " nnoremap <leader>ji :YcmCompleter GoToInclude<CR>
         nnoremap <leader>j :YcmCompleter GoTo<CR>
@@ -205,9 +195,15 @@ call plug#begin('~/.vim/bundle')
         autocmd User AsyncRunStart call asyncrun#quickfix_toggle(15, 1)
 
     " python
-    autocmd FileType python nnoremap K :YcmCompleter GetDoc<CR>
-    Plug 'nvie/vim-flake8', { 'for': 'python' }
-    Plug 'bps/vim-textobj-python', { 'for': 'python' }
+    " Plug 'nvie/vim-flake8', { 'for': 'python' }
+    " Plug 'kana/vim-textobj-user', { 'for': 'python' }
+    " Plug 'bps/vim-textobj-python', { 'for': 'python' }
+
+    " debug
+    Plug 'vim-scripts/Conque-GDB', { 'for': ['c', 'cpp', 'go'] }
+         let g:ConqueGdb_Leader = ','
+         let g:ConqueTerm_Color = 2
+         let g:ConqueTerm_CloseOnEnd = 1
 
     " c
     Plug 'vim-utils/vim-man', { 'on': 'Man' }
@@ -228,7 +224,6 @@ call plug#begin('~/.vim/bundle')
         autocmd FileType c,cpp vnoremap <buffer><leader>= :ClangFormat<CR>
 
     " golang
-    autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=4 shiftwidth=4
     Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries', 'for': 'go' }
         " let g:go_highlight_types = 1
         " let g:go_highlight_fields = 1
@@ -246,11 +241,15 @@ call plug#begin('~/.vim/bundle')
         au FileType go nmap <leader>r <Plug>(go-run)
         au FileType go nmap <leader>b <Plug>(go-build)
         au FileType go nmap <leader>t <Plug>(go-test)
-        au FileType go nmap <C-f> :GoDeclsDir<CR>
+        " au FileType go nmap <C-f> :GoDeclsDir<CR>
         " au FileType go nmap <Leader>gd <Plug>(go-doc)
         " au FileType go nmap K<Plug>(go-doc-vertical)
         " au FileType go nmap <leader>co <Plug>(go-coverage)
     Plug 'tweekmonster/hl-goimport.vim', { 'for': 'go' }
+
+    " Java
+    " Plug 'artur-shaik/vim-javacomplete2'
+    "     autocmd FileType java setlocal omnifunc=javacomplete#Complete
 
     " html
     Plug 'mattn/emmet-vim'
@@ -262,27 +261,13 @@ call plug#begin('~/.vim/bundle')
     " Plug 'junegunn/seoul256.vim'
     " Plug 'lifepillar/vim-solarized8'
     " Plug 'chriskempson/vim-tomorrow-theme'
-    Plug 'morhetz/gruvbox', { 'do': 'cp ~/.vim/bundle/gruvbox/colors/gruvbox.vim ~/.vim/colors/' }
-    " Plug 'chriskempson/base16-vim'
-    "     let g:base16_shell_path="~/.config/base16-shell/scripts"
-    "     if filereadable(expand("~/.vimrc_background"))
-    "       let base16colorspace=256
-    "       source ~/.vimrc_background
-    "     endif
-    " Plug 'nathanaelkane/vim-indent-guides'
-    "     let g:indent_guides_enable_on_vim_startup=0
-    "     let g:indent_guides_start_level=2
-    "     let g:indent_guides_guide_size=1
-
-    " Plug 'vim-airline/vim-airline'
-    " Plug 'vim-airline/vim-airline-themes'
-    "     let g:airline_powerline_fonts = 1
-    "     let g:airline_theme = "bubblegum"
-
-    Plug 'itchyny/lightline.vim'
-        let g:lightline = {
-              \ 'colorscheme': 'seoul256',
-              \ }
+    " Plug 'morhetz/gruvbox', { 'do': 'cp ~/.vim/bundle/gruvbox/colors/gruvbox.vim ~/.vim/colors/' }
+    " Plug 'itchyny/lightline.vim'
+    "     let g:lightline = {
+    "           \ 'colorscheme': 'seoul256',
+    "           \ }
+    "     set laststatus=2
+    "     set noshowmode
     Plug 'junegunn/limelight.vim', { 'on': 'Limelight' }
     Plug 'junegunn/goyo.vim', { 'on': 'Goyo' }
         nnoremap <silent> <leader>z :Goyo<CR>
@@ -292,13 +277,13 @@ call plug#begin('~/.vim/bundle')
     Plug 'ryanoasis/vim-devicons'
         set guifont=Source\ Code\ Pro\ Nerd\ Font\ Complete\ Mono:h12
 
-
     " utilities
     Plug 'bronson/vim-trailing-whitespace'
     Plug 'tpope/vim-surround'
     Plug 'jiangmiao/auto-pairs'
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-unimpaired'
+    " Plug 'djoshea/vim-autoread'
 
     " search
     Plug 'google/vim-searchindex'
@@ -312,7 +297,7 @@ call plug#begin('~/.vim/bundle')
     Plug 'tpope/vim-commentary'
 
     " snippet
-    Plug 'SirVer/ultisnips'
+    " Plug 'SirVer/ultisnips'
 
     " file navigation
     Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
@@ -330,13 +315,13 @@ call plug#begin('~/.vim/bundle')
     Plug 'junegunn/fzf.vim'
         nnoremap <C-p> :FZF<CR>
         " nnoremap <leader>bb :Buffers<CR>
-        nmap <leader><tab> <plug>(fzf-maps-n)
-        xmap <leader><tab> <plug>(fzf-maps-x)
-        omap <leader><tab> <plug>(fzf-maps-o)
+        " nmap <leader><tab> <plug>(fzf-maps-n)
+        " xmap <leader><tab> <plug>(fzf-maps-x)
+        " omap <leader><tab> <plug>(fzf-maps-o)
         " imap <c-x><c-k> <plug>(fzf-complete-word)
         imap <c-x><c-f> <plug>(fzf-complete-path)
         " imap <c-x><c-j> <plug>(fzf-complete-file-ag)
-        imap <c-x><c-l> <plug>(fzf-complete-line)
+        " imap <c-x><c-l> <plug>(fzf-complete-line)
 
     " git
     Plug 'tpope/vim-fugitive'
@@ -345,6 +330,7 @@ call plug#begin('~/.vim/bundle')
 
     " Chinese input compatibility
     Plug 'CodeFalling/fcitx-vim-osx'
+    " Plug 'rlue/vim-barbaric'
 
     " tmux
     Plug 'christoomey/vim-tmux-navigator'
@@ -370,6 +356,9 @@ call plug#end()
 autocmd FileType python setlocal ts=4 sts=4 sw=4 et colorcolumn=80
 let python_highlight_all=1
 
+" using k to search doc
+autocmd FileType python nnoremap K :YcmCompleter GetDoc<CR>
+
 " add matching pairs
 autocmd FileType python let b:match_words = '\<if\>:\<elif\>:\<else\>'
 
@@ -379,18 +368,16 @@ autocmd FileType python nnoremap <leader>= :0,$!yapf<CR><C-o>
 " add breakpoint
 autocmd FileType python nnoremap <leader>bk :normal Oimport ipdb; ipdb.set_trace()<ESC>j
 
-" enable using `gf` to search module
-autocmd FileType python setlocal path+=/Users/alan/anaconda3/lib/python3.6,/Users/alan/anaconda3/lib/python3.6/site-packages
-
-" use make to run python
-autocmd FileType python setlocal makeprg=python\ %
-autocmd FileType python compiler pyunit
-
 " run python
 autocmd FileType python nnoremap <leader>r :!python %<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Auto Run
+" => Customizations about Golang
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+autocmd FileType go setlocal noexpandtab tabstop=4 shiftwidth=4
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Utilities
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 autocmd FileType c,cpp nnoremap <leader>r :call CompileAndRun()<CR>
 function! CompileAndRun()
@@ -405,4 +392,22 @@ function! CompileAndRun()
     "     exec "GoRun"
     endif
 endfunction
+
+"refresh vimrc after saving
+autocmd BufWritePost ~/.vimrc source %
+autocmd BufWritePost ~/.vim/vimrc source %
+
+" edit crontab in Mac
+autocmd FileType crontab setlocal nowritebackup
+
+" restore cursor position when opening file
+autocmd BufReadPost *
+    \ if line("'\"") > 1 && line("'\"") <= line("$") |
+    \   exe "normal! g`\"" |
+    \ endif "`'")"'")
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => other customization
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+hi LineNr ctermfg=237
 
