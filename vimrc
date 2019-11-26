@@ -1,23 +1,62 @@
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Config only for vim
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if !has('nvim')
+  unlet! skip_defaults_vim
+  source $VIMRUNTIME/defaults.vim
+
+  set encoding=utf8
+
+  if has('syntax') && has('eval')
+    packadd! matchit
+  endif
+
+  set undodir=~/.vim/undo
+endif
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Config for neovim
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has('nvim')
+  set laststatus=1
+  set mouse=a
+  set scrolloff=5
+  inoremap <C-U> <C-G>u<C-U>
+endif
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Essential
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" vi noncompatible mode
-set nocompatible
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set ignorecase   " Ignore case when searching
+set smartcase    " Don't ignore case when search has capital letter
+set nojoinspaces " prevents insert two space after punctuation
+set hidden       " Allow buffer switching without saving
+set showmatch    " show matching brakets/parenthesis
+set relativenumber
+set splitbelow
+set splitright
 
-" open filetype detection
-filetype plugin indent on
+" making undo persist between sessions
+set undofile
+augroup undo
+  autocmd!
+  autocmd BufWritePre /tmp/* setlocal noundofile
+augroup END
 
-" backspace anything
-set backspace=indent,eol,start
+" When editing a file, always jump to the last known cursor position.
+augroup vimStartup
+  autocmd!
+  autocmd BufReadPost *
+    \ if line("'\"") >= 1 && line("'\"") <= line("$") && &ft !~# 'commit'
+    \ |   exe "normal! g`\""
+    \ | endif
+augroup END
 
-" UTF-8 support
-set encoding=utf8
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Keymappings
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" map space to leader
-map <Space> <leader>
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nmap <Space> <leader>
+xmap <Space> <leader>
 
 " copy to system clipboard
 vnoremap <leader>y "+y
@@ -29,11 +68,8 @@ nmap <leader>q :q<CR>
 nmap <leader>w :w<CR>
 nmap <leader>e :wq<CR>
 
-" enable undo C-u
-inoremap <C-U> <C-G>u<C-U>
-
-" quick close quickfix & location list window
-nnoremap <leader>a :cclose<CR>:lclose<CR>
+" quick close quickfix & location & preview window
+nnoremap <leader>a :cclose<CR>:lclose<CR>:pclose<CR>
 
 " use w!! to save files with sudo
 cmap w!! w !sudo tee > /dev/null %
@@ -42,372 +78,191 @@ cmap w!! w !sudo tee > /dev/null %
 nnoremap & :&&<CR>
 xnoremap & :&&<CR>
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Display
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" set color
-set background=dark
-" colorscheme Tomorrow-Night-Eighties
-colorscheme gruvbox
-
-" display status line
-" set laststatus=2
-
-" Show my current position in the status bar
-set ruler
-
-" Show the keystrokes being entered in the screen
-set showcmd
-
-" Show the mode we're using if not normal mode (e.g. --INSERT--)
-set showmode
-
-" display line number on current line and relativenumber on other lines
-set relativenumber
-
-" highlight current position
-" set cursorline
-" set cursorcolumn
-
-" highlight column 80
-set colorcolumn=80
-
-" support 256 colors
-if !has('gui_running')
-  set t_Co=256
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if isdirectory($HOME . "/.vim/pack/minpac/start/gruvbox")
+    set background=dark
+    colorscheme gruvbox
 endif
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Coding
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set nowrap
-
-syntax enable
-syntax on
-
-" tabs settings
-set expandtab
-set tabstop=4
-set shiftwidth=4
-set softtabstop=4
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Search
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Ignore case when searching
-set ignorecase
-
-" adjust depend on the case
-set infercase
-
-" Highlight while searching with / or ?
-set incsearch
-
-" Don't ignore case when search has capital letter
-set smartcase
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Others
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Autocomplete commands using nice menu in place of window status
-set wildmenu
-
-" Enable mouse for scrolling and window resizing.
-set mouse=a
-
-" Prevents inserting two spaces after punctuation on a join (J)
-set nojoinspaces
-
-" Delete comment character when joining commented lines
-set formatoptions+=j
-
-" increase command history
-set history=200
-
-" Allow buffer switching without saving"
-set hidden
-
-" enable matchit functionality
-runtime macros/matchit.vim
-
-" show matching brakets/parenthesis
-set showmatch
-
-" more natural split opening
-set splitbelow
-set splitright
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Plugins
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" autoinstall Plug
-if empty(glob('~/.vim/autoload/plug.vim'))
-  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
-    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-  autocmd VimEnter * PlugInstall | source $MYVIMRC
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Plugin Management
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" self-install minpac
+if empty(glob('~/.vim/pack/minpac/opt/minpac'))
+  let s:minpac_first_install=1
+  silent !git clone https://github.com/k-takata/minpac.git
+                          \ ~/.vim/pack/minpac/opt/minpac
 endif
 
-call plug#begin('~/.vim/bundle')
-    " lint
-    Plug 'w0rp/ale'
-        let g:ale_lint_on_save = 1
-        let g:ale_lint_on_text_changed = 0
-        let g:ale_lint_on_enter = 0
-        let g:ale_open_list = 1
-        let g:ale_keep_list_window_open = 0
-        let g:ale_linters = {
-        \   'python': ['flake8'],
-        \}
+function! PackInit() abort
+  packadd minpac
+  call minpac#init({'verbose': 3})
+  call minpac#add('k-takata/minpac', {'type': 'opt'})
 
-    " syntax highlight
-    Plug 'sheerun/vim-polyglot'
+  " utilities
+  call minpac#add('bronson/vim-trailing-whitespace') " highlight trailing whitespace
+  call minpac#add('tpope/vim-unimpaired')            " Pairs of handy bracket mappings
+  call minpac#add('tpope/vim-commentary')            " gc to comment/uncomment
+  call minpac#add('tpope/vim-surround')              " ds/cs to delete/change surroundings
+  call minpac#add('google/vim-searchindex')          " display search index
+  call minpac#add('tyru/open-browser.vim')
+  call minpac#add('Valloric/ListToggle')             " easy toggle quickfix/location list
 
-    " code completion
-    Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --go-completer' }
-        " do not insert until we choose one
-        set completeopt+=noselect
-        let g:ycm_autoclose_preview_window_after_insertion = 1
-        let g:ycm_autoclose_preview_window_after_completion = 1
-        " let g:ycm_goto_buffer_command = 'vertical-split'
-        let g:ycm_python_binary_path = 'python'
-        " let g:ycm_server_python_interpreter = ''
-        let g:ycm_confirm_extra_conf = 0
-        let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
-        nnoremap gd :YcmCompleter GoToDeclaration<CR>
-        " nnoremap <leader>df :YcmCompleter GoToDefinition<CR>
-        " nnoremap <leader>ji :YcmCompleter GoToInclude<CR>
-        nnoremap <leader>j :YcmCompleter GoTo<CR>
-        " nnoremap <leader>jh :YcmCompleter GetDoc<CR>
+  " style
+  call minpac#add('junegunn/goyo.vim')               " distract-free mode
+  call minpac#add('morhetz/gruvbox')
+  call minpac#add('mhinz/vim-startify')              " fancy start screen
+  call minpac#add('machakann/vim-highlightedyank')   " highlight yank text
 
-        " triggers for html and css
-        let g:ycm_semantic_triggers = {
-            \   'css': [ 're!^\s{4}', 're!:\s+'],
-            \   'html': [ '</' ],
-            \ }
+  " git
+  call minpac#add('tpope/vim-fugitive')
+  call minpac#add('airblade/vim-gitgutter')
 
-    " Plug 'majutsushi/tagbar'
-    "     nmap <leader>tt :TagbarToggle<CR>
-    "     let tagbar_left=0
-    "     let tagbar_width=32
-    "     let g:tagbar_compact=1
+  " pandoc
+  call minpac#add('vim-pandoc/vim-pandoc-syntax')
+  call minpac#add('vim-pandoc/vim-pandoc')
 
-    Plug 'skywind3000/asyncrun.vim'
-        autocmd User AsyncRunStart call asyncrun#quickfix_toggle(15, 1)
+  " fzf
+  call minpac#add('junegunn/fzf', {'do': '!./install --all'})
+  call minpac#add('junegunn/fzf.vim')
 
-    " python
-    " Plug 'nvie/vim-flake8', { 'for': 'python' }
-    " Plug 'kana/vim-textobj-user', { 'for': 'python' }
-    " Plug 'bps/vim-textobj-python', { 'for': 'python' }
+  " grep
+  call minpac#add('mhinz/vim-grepper')
 
-    " debug
-    Plug 'vim-scripts/Conque-GDB', { 'for': ['c', 'cpp', 'go'] }
-         let g:ConqueGdb_Leader = ','
-         let g:ConqueTerm_Color = 2
-         let g:ConqueTerm_CloseOnEnd = 1
+  " lsp
+  call minpac#add('autozimu/LanguageClient-neovim', {'branch': 'next', 'do': '!./install.sh'})
 
-    " c
-    Plug 'vim-utils/vim-man', { 'on': 'Man' }
+  " code completion
+  call minpac#add('Shougo/deoplete.nvim')
 
-    " cpp
-    Plug 'octol/vim-cpp-enhanced-highlight', { 'for': 'cpp' }
-    Plug 'derekwyatt/vim-fswitch', { 'for': ['c', 'cpp'] }
-        autocmd FileType c,cpp nmap <silent> <leader>sw :FSHere<CR>
-        let b:fswitchdst  = 'cpp, h'
-    Plug 'derekwyatt/vim-protodef', { 'for': 'cpp' }
-    Plug 'rhysd/vim-clang-format', { 'for': ['c', 'cpp'] }
-        let g:clang_format#style_options = {
-                    \ "AccessModifierOffset" : -4,
-                    \ "AllowShortIfStatementsOnASingleLine" : "true",
-                    \ "AlwaysBreakTemplateDeclarations" : "true",
-                    \ "Standard" : "C++11"}
-        autocmd FileType c,cpp nnoremap <buffer><leader>= :<C-u>ClangFormat<CR>
-        autocmd FileType c,cpp vnoremap <buffer><leader>= :ClangFormat<CR>
+  " testing
+  " call minpac#add('janko/vim-test')
 
-    " golang
-    Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries', 'for': 'go' }
-        " let g:go_highlight_types = 1
-        " let g:go_highlight_fields = 1
-        " let g:go_highlight_functions = 1
-        " let g:go_highlight_methods = 1
-        " let g:go_highlight_build_constraints = 1
-        let g:go_def_mode = 'godef'
-        " let g:go_auto_type_info = 1
-        " let g:go_auto_sameids = 1
-        " au FileType go nmap <Leader>s <Plug>(go-implements)
-        " au FileType go nmap <Leader>i <Plug>(go-info)
-        " au FileType go nmap <Leader>c <Plug>(go-rename)
-        " au FileType go nmap gd :GoDef<CR>
-        au FileType go nmap <leader>i :GoImports<CR>
-        au FileType go nmap <leader>r <Plug>(go-run)
-        au FileType go nmap <leader>b <Plug>(go-build)
-        au FileType go nmap <leader>t <Plug>(go-test)
-        " au FileType go nmap <C-f> :GoDeclsDir<CR>
-        " au FileType go nmap <Leader>gd <Plug>(go-doc)
-        " au FileType go nmap K<Plug>(go-doc-vertical)
-        " au FileType go nmap <leader>co <Plug>(go-coverage)
-    Plug 'tweekmonster/hl-goimport.vim', { 'for': 'go' }
-
-    " Java
-    " Plug 'artur-shaik/vim-javacomplete2'
-    "     autocmd FileType java setlocal omnifunc=javacomplete#Complete
-
-    " html
-    Plug 'mattn/emmet-vim'
-        let g:user_emmet_install_global = 0
-        autocmd FileType html,css EmmetInstall
-
-    " style
-    " Plug 'flazz/vim-colorschemes'
-    " Plug 'junegunn/seoul256.vim'
-    " Plug 'lifepillar/vim-solarized8'
-    " Plug 'chriskempson/vim-tomorrow-theme'
-    " Plug 'morhetz/gruvbox', { 'do': 'cp ~/.vim/bundle/gruvbox/colors/gruvbox.vim ~/.vim/colors/' }
-    " Plug 'itchyny/lightline.vim'
-    "     let g:lightline = {
-    "           \ 'colorscheme': 'seoul256',
-    "           \ }
-    "     set laststatus=2
-    "     set noshowmode
-    Plug 'junegunn/limelight.vim', { 'on': 'Limelight' }
-    Plug 'junegunn/goyo.vim', { 'on': 'Goyo' }
-        nnoremap <silent> <leader>z :Goyo<CR>
-        autocmd! User GoyoEnter Limelight
-        autocmd! User GoyoLeave Limelight!
-    Plug 'mhinz/vim-startify'
-    Plug 'ryanoasis/vim-devicons'
-        set guifont=Source\ Code\ Pro\ Nerd\ Font\ Complete\ Mono:h12
-
-    " utilities
-    Plug 'bronson/vim-trailing-whitespace'
-    Plug 'tpope/vim-surround'
-    Plug 'jiangmiao/auto-pairs'
-    Plug 'tpope/vim-repeat'
-    Plug 'tpope/vim-unimpaired'
-    " Plug 'djoshea/vim-autoread'
-
-    " search
-    Plug 'google/vim-searchindex'
-    Plug 'mileszs/ack.vim'
-        nnoremap <C-f> :Ack<SPACE>
-        if executable('ag')
-            let g:ackprg = 'ag --vimgrep'
-        endif
-
-    " comment and uncomment
-    Plug 'tpope/vim-commentary'
-
-    " snippet
-    " Plug 'SirVer/ultisnips'
-
-    " file navigation
-    Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
-        nnoremap <C-N> :NERDTreeToggle<CR>
-        let NERDTreeWinSize=32
-        let NERDTreeWinPos="left"
-        let NERDTreeShowHidden=0
-        let NERDTreeMinimalUI=1
-        let NERDTreeAutoDeleteBuffer=1
-        let NERDTreeIgnore=['\.pyc','\.swp']
-    " Plug 'jlanzarotta/bufexplorer'
-    "     let g:bufExplorerShowRelativePath=1
-    "     nmap <leader>o :BufExplorer<CR>
-    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-    Plug 'junegunn/fzf.vim'
-        nnoremap <C-p> :FZF<CR>
-        " nnoremap <leader>bb :Buffers<CR>
-        " nmap <leader><tab> <plug>(fzf-maps-n)
-        " xmap <leader><tab> <plug>(fzf-maps-x)
-        " omap <leader><tab> <plug>(fzf-maps-o)
-        " imap <c-x><c-k> <plug>(fzf-complete-word)
-        imap <c-x><c-f> <plug>(fzf-complete-path)
-        " imap <c-x><c-j> <plug>(fzf-complete-file-ag)
-        " imap <c-x><c-l> <plug>(fzf-complete-line)
-
-    " git
-    Plug 'tpope/vim-fugitive'
-    Plug 'airblade/vim-gitgutter'
-        let g:gitgutter_map_keys = 0
-
-    " Chinese input compatibility
-    Plug 'CodeFalling/fcitx-vim-osx'
-    " Plug 'rlue/vim-barbaric'
-
-    " tmux
-    Plug 'christoomey/vim-tmux-navigator'
-        let g:tmux_navigator_no_mappings = 1
-        nnoremap <silent> <C-h> :TmuxNavigateLeft<CR>
-        nnoremap <silent> <C-j> :TmuxNavigateDown<CR>
-        nnoremap <silent> <C-k> :TmuxNavigateUp<CR>
-        nnoremap <silent> <C-l> :TmuxNavigateRight<CR>
-        nnoremap <silent> <C-/> :TmuxNavigatePrevious<CR>
-
-    " see registor contents
-    Plug 'junegunn/vim-peekaboo'
-
-    " markdown
-    Plug 'godlygeek/tabular'
-    Plug 'plasticboy/vim-markdown'
-call plug#end()
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Customizations about Python
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" pep8 style
-autocmd FileType python setlocal ts=4 sts=4 sw=4 et colorcolumn=80
-let python_highlight_all=1
-
-" using k to search doc
-autocmd FileType python nnoremap K :YcmCompleter GetDoc<CR>
-
-" add matching pairs
-autocmd FileType python let b:match_words = '\<if\>:\<elif\>:\<else\>'
-
-" run yapf formater
-autocmd FileType python nnoremap <leader>= :0,$!yapf<CR><C-o>
-
-" add breakpoint
-autocmd FileType python nnoremap <leader>bk :normal Oimport ipdb; ipdb.set_trace()<ESC>j
-
-" run python
-autocmd FileType python nnoremap <leader>r :!python %<CR>
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Customizations about Golang
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-autocmd FileType go setlocal noexpandtab tabstop=4 shiftwidth=4
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Utilities
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-autocmd FileType c,cpp nnoremap <leader>r :call CompileAndRun()<CR>
-function! CompileAndRun()
-    exec "w"
-    if (&filetype == 'c')
-        exec "AsyncRun clang % -o %< && ./%<"
-    elseif (&filetype == 'cpp')
-        exec "AsyncRun clang++ -std=c++1y % -o %< && ./%<"
-    " elseif (&filetype == 'python')
-    "     exec "AsyncRun python %"
-    " elseif (&filetype == 'go')
-    "     exec "GoRun"
-    endif
+  " Chinese input
+  " call minpac#add('rlue/vim-barbaric')
 endfunction
 
-"refresh vimrc after saving
-autocmd BufWritePost ~/.vimrc source %
-autocmd BufWritePost ~/.vim/vimrc source %
+" user commands for updating/cleaning the plugins
+command! PackUpdate call PackInit() | call minpac#update('', {'do': 'call minpac#status()'})
+command! PackClean  call PackInit() | call minpac#clean()
+command! PackStatus call PackInit() | call minpac#status()
 
-" edit crontab in Mac
-autocmd FileType crontab setlocal nowritebackup
+" addintional functionality
+function! PackList(...)
+  call PackInit()
+  return join(sort(keys(minpac#getpluglist())), "\n")
+endfunction
+" execute :PackOpenDir <plugin> to open a shell at the directory of the plugin
+command! -nargs=1 -complete=custom,PackList
+      \ PackOpenDir call PackInit() | call term_start(&shell,
+      \    {'cwd': minpac#getpluginfo(<q-args>).dir,
+      \     'term_finish': 'close'})
+" execute :PackOpenUrl <plugin> to open the repo of the plugin in a browser
+command! -nargs=1 -complete=custom,PackList
+      \ PackOpenUrl call PackInit() | call openbrowser#open(
+      \    minpac#getpluginfo(<q-args>).url)
 
-" restore cursor position when opening file
-autocmd BufReadPost *
-    \ if line("'\"") > 1 && line("'\"") <= line("$") |
-    \   exe "normal! g`\"" |
-    \ endif "`'")"'")
+" self-install packages
+if exists('s:minpac_first_install')
+  call PackInit() | call minpac#update('', {'do': 'call minpac#status()'})
+endif
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => other customization
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-hi LineNr ctermfg=237
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Plugin Settings
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Goyo
+nnoremap <silent> <leader>z :Goyo<CR>
 
+" ListToggle
+let g:lt_location_list_toggle_map = '<leader>l'
+let g:lt_quickfix_list_toggle_map = '<leader>c'
+
+" vim-pandoc
+let g:pandoc#biblio#bibs=["/Users/wplai/.zotero/references.bib"]
+let g:pandoc#biblio#use_bibtool=1
+
+" fzf
+nnoremap <C-p> :<C-u>FZF<CR>
+
+" Grepper
+nnoremap <Leader>g :Grepper -tool rg<CR>
+nnoremap <Leader>* :Grepper -tool rg -cword -noprompt<CR>
+nmap gs <plug>(GrepperOperator)
+xmap gs <plug>(GrepperOperator)
+
+" LanguageClient {
+let g:LanguageClient_serverCommands = {
+    \ 'python': ['/Library/Frameworks/Python.framework/Versions/3.8/bin/pyls'],
+    \ }
+let g:LanguageClient_useVirtualText=0
+" use gq to format
+function LC_config()
+  if has_key(g:LanguageClient_serverCommands, &filetype)
+    nnoremap <buffer> <silent> K :call LanguageClient#textDocument_hover()<cr>
+    nnoremap <buffer> <silent> gd :call LanguageClient#textDocument_definition()<CR>
+    nnoremap <buffer> <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
+    nnoremap <buffer> <silent> <F1> :call LanguageClient_contextMenu()<CR>
+    nnoremap <buffer> <silent> <Leader>= :call LanguageClient_textDocument_formatting()<CR>
+    setlocal formatexpr=LanguageClient#textDocument_rangeFormatting_sync()
+    setlocal signcolumn=yes
+  endif
+endfunction
+" }
+
+" deoplete
+if has('nvim')
+  let g:deoplete#enable_at_startup = 1
+endif
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Markdown
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+augroup md
+  autocmd!
+  autocmd FileType markdown setlocal et ts=4 sts=4 sw=4
+  autocmd FileType markdown setlocal spell spelllang=en_us
+  autocmd FileType markdown call deoplete#disable()
+augroup END
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Python
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+augroup python
+  autocmd!
+  autocmd FileType python setlocal ts=4 sts=4 sw=4 et colorcolumn=80
+  autocmd FileType python let b:match_words = '\<if\>:\<elif\>:\<else\>'
+  autocmd FileType python nnoremap <leader>bk :normal Oimport ipdb; ipdb.set_trace()<ESC>j
+  autocmd FileType python nnoremap <leader>r :!python3 %<CR>
+  autocmd FileType python call LC_config()  " use LanguageClient
+augroup END
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Golang
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+augroup golang
+  autocmd!
+  autocmd FileType go setlocal noexpandtab tabstop=4 shiftwidth=4
+augroup END
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Git
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+augroup git
+  autocmd!
+  autocmd FileType gitcommit setlocal spell textwidth=72 colorcolumn=73
+augroup END
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Other utilities
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+augroup mac
+  autocmd!
+  autocmd FileType crontab setlocal nowritebackup
+augroup END
+
+augroup vim
+  autocmd!
+  autocmd FileType vim setlocal sw=2
+augroup END
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
