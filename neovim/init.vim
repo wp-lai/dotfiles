@@ -64,6 +64,12 @@ if isdirectory($VIMCONFIG . "/pack/minpac/start/gruvbox")
     colorscheme gruvbox
 endif
 
+" True color support
+if (has("termguicolors"))
+  set termguicolors
+endif
+
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugin Management
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -85,7 +91,7 @@ function! PackInit() abort
 
   " style
   call minpac#add('junegunn/goyo.vim')               " distract-free mode
-  call minpac#add('morhetz/gruvbox')
+  call minpac#add('morhetz/gruvbox')                 " theme
   call minpac#add('mhinz/vim-startify')              " fancy start screen
   call minpac#add('machakann/vim-highlightedyank')   " highlight yank text
 
@@ -169,7 +175,7 @@ let g:LanguageClient_useVirtualText=0
 " use gq to format
 function LC_config()
   if has_key(g:LanguageClient_serverCommands, &filetype)
-    nnoremap <buffer> <silent> K :call LanguageClient#textDocument_hover()<cr>
+    nnoremap <buffer> <silent> K :call LanguageClient#textDocument_hover()<CR>
     nnoremap <buffer> <silent> gd :call LanguageClient#textDocument_definition()<CR>
     nnoremap <buffer> <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
     nnoremap <buffer> <silent> <F1> :call LanguageClient_contextMenu()<CR>
@@ -209,7 +215,7 @@ augroup python
   autocmd FileType python let b:match_words = '\<if\>:\<elif\>:\<else\>'
   autocmd FileType python nnoremap <leader>bk :normal Oimport ipdb; ipdb.set_trace()<ESC>j
   autocmd FileType python nnoremap <leader>r :!python3 %<CR>
-  autocmd FileType python call LC_config()  " use LanguageClient
+  autocmd FileType python call LC_config()
 augroup END
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -219,6 +225,7 @@ augroup golang
   autocmd!
   autocmd FileType go setlocal noexpandtab tabstop=4 shiftwidth=4
 augroup END
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Git
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -233,6 +240,8 @@ augroup END
 augroup mac
   autocmd!
   autocmd FileType crontab setlocal nowritebackup
+  " make comments italic
+  autocmd VimEnter * highlight Comment cterm=italic gui=italic
 augroup END
 
 augroup vim
