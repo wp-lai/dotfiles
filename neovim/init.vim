@@ -6,7 +6,7 @@
 "
 "
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Essential
+" => Essential {{{1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set laststatus=1
 set mouse=a
@@ -38,7 +38,7 @@ augroup vimStartup
 augroup END
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Keymappings
+" => Keymappings {{{1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 map <Space> <leader>
 
@@ -65,7 +65,7 @@ nnoremap & :&&<CR>
 xnoremap & :&&<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Display
+" => Display {{{1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " if isdirectory($VIMCONFIG . "/pack/minpac/start/vim-gruvbox8")
 "     colorscheme gruvbox8_hard
@@ -82,71 +82,72 @@ endif
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Plugin Management
+" => Plugin Management {{{1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" install minpac first
+" install minpac first {{{2
 " git clone https://github.com/k-takata/minpac.git ~/.config/nvim/pack/minpac/opt/minpac
 function! PackInit() abort
   packadd minpac
   call minpac#init({'verbose': 3})
   call minpac#add('k-takata/minpac', {'type': 'opt'})
 
-  " utilities
+  " utilities {{{2
   call minpac#add('bronson/vim-trailing-whitespace') " highlight trailing whitespace
   call minpac#add('tpope/vim-unimpaired')            " Pairs of handy bracket mappings
   call minpac#add('tpope/vim-commentary')            " gc to comment/uncomment
-  call minpac#add('tpope/vim-surround')            " ds/cs to delete/change surroundings
-  call minpac#add('google/vim-searchindex')        " display search index
+  call minpac#add('tpope/vim-surround')              " ds/cs to delete/change surroundings
+  call minpac#add('google/vim-searchindex')          " display search index
   call minpac#add('tyru/open-browser.vim')
-  call minpac#add('Valloric/ListToggle')           " easy toggle quickfix/location list
-  call minpac#add('junegunn/vim-easy-align')       " easy align text
+  call minpac#add('Valloric/ListToggle')             " easy toggle quickfix/location list
+  call minpac#add('junegunn/vim-easy-align')         " easy align text
 
-  " style
-  call minpac#add('junegunn/goyo.vim')             " distract-free mode
-  call minpac#add('mhinz/vim-startify')            " fancy start screen
-  call minpac#add('machakann/vim-highlightedyank') " highlight yank text
+                                                     " style {{{2
+  call minpac#add('junegunn/goyo.vim')               " distract-free mode
+  call minpac#add('mhinz/vim-startify')              " fancy start screen
+  call minpac#add('machakann/vim-highlightedyank')   " highlight yank text
 
-  " theme
+  " theme {{{2
   call minpac#add('lifepillar/vim-gruvbox8')
   call minpac#add('arcticicestudio/nord-vim')
   " call minpac#add('morhetz/gruvbox')
 
-  " lint
+  " lint {{{2
   " call minpac#add('dense-analysis/ale')
 
-  " git
+  " git {{{2
   call minpac#add('tpope/vim-fugitive')
   call minpac#add('airblade/vim-gitgutter')
 
-  " pandoc
+  " pandoc {{{2
   call minpac#add('vim-pandoc/vim-pandoc-syntax')
   call minpac#add('vim-pandoc/vim-pandoc')
 
-  " fzf
+  " fzf {{{2
   call minpac#add('junegunn/fzf', {'do': '!./install --all'})
   call minpac#add('junegunn/fzf.vim')
 
-  " grep
+  " grep {{{2
   call minpac#add('mhinz/vim-grepper')
 
-  " code completion
+  " code completion {{{2
   call minpac#add('neoclide/coc.nvim', {'branch': 'release'})
 
-  " R
+  " R {{{2
   call minpac#add('jalvesaq/Nvim-R')
   call minpac#add('chrisbra/csv.vim')
 
-  " document: Dash
-  call minpac#add('rizzatti/dash.vim')
+  " document: Dash {{{2
+  " call minpac#add('rizzatti/dash.vim')
 
-  " testing
+  " testing {{{2
   " call minpac#add('janko/vim-test')
 
-  " Chinese input
+  " Chinese input {{{2
   " call minpac#add('rlue/vim-barbaric')
   " call minpac#add('ybian/smartim')
 endfunction
 
+" minpac-config {{{2
 " user commands for updating/cleaning the plugins
 command! PackUpdate call PackInit() | call minpac#update('', {'do': 'call minpac#status()'})
 command! PackClean  call PackInit() | call minpac#clean()
@@ -168,10 +169,14 @@ command! -nargs=1 -complete=custom,PackList
       \    minpac#getpluginfo(<q-args>).url)
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Plugin Settings
+" => Plugin Settings {{{1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Goyo
 nnoremap <silent> <leader>z :Goyo<CR>
+let g:goyo_width = 120
+
+" vim-pandoc-syntax
+let g:pandoc#syntax#conceal#use = 0
 
 " vim-easy-align
 xmap ga <Plug>(EasyAlign)
@@ -197,9 +202,6 @@ xmap gs <plug>(GrepperOperator)
 " gitgutter
 set updatetime=300
 
-" dash
-nmap <silent> <leader>d <Plug>DashSearch<CR>
-
 " Nvim-R
 " R output is highlighted with current colorscheme
 let g:rout_follow_colorscheme = 1
@@ -211,13 +213,13 @@ let R_assign_map = "--"
 " let R_rconsole_width = 1000
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Coc.nvim
+" => Coc.nvim {{{1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set hidden
 set nobackup
 set nowritebackup
 set cmdheight=2
-set updatetime=300
+" set updatetime=300
 set shortmess+=c
 " set signcolumn=yes
 
@@ -257,7 +259,9 @@ nmap <silent> gr <Plug>(coc-references)
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 
 function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
+  if (coc#util#has_float())
+    execute 'wincmd w'
+  elseif (index(['vim','help'], &filetype) >= 0)
     execute 'h '.expand('<cword>')
   else
     call CocAction('doHover')
@@ -332,7 +336,7 @@ nnoremap <silent> <leader>gp  :<C-u>CocListResume<CR>
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Markdown
+" => Markdown {{{1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 augroup md
   autocmd!
@@ -342,7 +346,7 @@ augroup md
 augroup END
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Python
+" => Python {{{1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:python3_host_prog="/Library/Frameworks/Python.framework/Versions/3.8/bin/python3"
 augroup python
@@ -356,7 +360,7 @@ augroup python
 augroup END
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Golang
+" => Golang {{{1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 augroup golang
   autocmd!
@@ -364,7 +368,7 @@ augroup golang
 augroup END
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Git
+" => Git {{{1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 augroup git
   autocmd!
@@ -372,13 +376,11 @@ augroup git
 augroup END
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => R
+" => R {{{1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 augroup rstat
   autocmd!
-  " autocmd FileType r,rmd call ncm2#enable_for_buffer()
   autocmd FileType r setlocal et ts=2 sts=2 sw=2
-  " autocmd FileType r call LC_config()
   autocmd FileType r,rmd nmap , <Plug>RDSendLine
   autocmd FileType r,rmd vmap , <Plug>RDSendSelection
   autocmd FileType r,rmd vmap ,e <Plug>RESendSelection
@@ -386,7 +388,7 @@ augroup rstat
 augroup END
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Other utilities
+" => Other utilities {{{1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 augroup mygroup
   autocmd!
@@ -397,6 +399,7 @@ augroup END
 augroup Vim
   autocmd!
   autocmd FileType vim setlocal sw=2
+  autocmd FileType vim setlocal foldmethod=marker foldcolumn=3
   autocmd BufWritePost $MYVIMRC source $MYVIMRC
   " make comments italic
   autocmd VimEnter * highlight Comment cterm=italic gui=italic
