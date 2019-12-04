@@ -8,7 +8,6 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Essential {{{1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set laststatus=1
 set mouse=a
 set scrolloff=5
 set ignorecase   " Ignore case when searching
@@ -37,10 +36,17 @@ augroup vimStartup
     \ | endif
 augroup END
 
+" netrw
+let g:netrw_liststyle=3
+let g:netrw_banner=0
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Keymappings {{{1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 map <Space> <leader>
+
+" use <TAB> to navigate window
+nnoremap <silent> <Tab> <C-w>w
 
 " copy to system clipboard
 vnoremap <leader>y "+y
@@ -67,10 +73,6 @@ xnoremap & :&&<CR>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Display {{{1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" if isdirectory($VIMCONFIG . "/pack/minpac/start/vim-gruvbox8")
-"     colorscheme gruvbox8_hard
-" endif
-
 if isdirectory($VIMCONFIG . "/pack/minpac/start/nord-vim")
     colorscheme nord
 endif
@@ -79,7 +81,6 @@ endif
 if (has("termguicolors"))
   set termguicolors
 endif
-
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugin Management {{{1
@@ -107,12 +108,7 @@ function! PackInit() abort
   call minpac#add('machakann/vim-highlightedyank')   " highlight yank text
 
   " theme {{{2
-  call minpac#add('lifepillar/vim-gruvbox8')
   call minpac#add('arcticicestudio/nord-vim')
-  " call minpac#add('morhetz/gruvbox')
-
-  " lint {{{2
-  " call minpac#add('dense-analysis/ale')
 
   " git {{{2
   call minpac#add('tpope/vim-fugitive')
@@ -135,16 +131,6 @@ function! PackInit() abort
   " R {{{2
   call minpac#add('jalvesaq/Nvim-R')
   call minpac#add('chrisbra/csv.vim')
-
-  " document: Dash {{{2
-  " call minpac#add('rizzatti/dash.vim')
-
-  " testing {{{2
-  " call minpac#add('janko/vim-test')
-
-  " Chinese input {{{2
-  " call minpac#add('rlue/vim-barbaric')
-  " call minpac#add('ybian/smartim')
 endfunction
 
 " minpac-config {{{2
@@ -191,7 +177,7 @@ let g:pandoc#biblio#bibs        = ["/Users/wplai/.zotero/references.bib"]
 let g:pandoc#biblio#use_bibtool = 1
 
 " fzf
-nnoremap <C-p> :<C-u>FZF<CR>
+nnoremap <C-t> :<C-u>FZF<CR>
 
 " Grepper
 nnoremap <Leader>gg :Grepper -tool rg<CR>
@@ -208,9 +194,7 @@ let g:rout_follow_colorscheme = 1
 " R commands in R output are highlighted
 let g:Rout_more_colors = 1
 " press -- to have Nvim-R insert the assignment operator: <-
-let R_assign_map = "--"
-" make sure the console is at the bottom by making it really wide
-" let R_rconsole_width = 1000
+let R_assign_map = "<<"
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Coc.nvim {{{1
@@ -219,9 +203,7 @@ set hidden
 set nobackup
 set nowritebackup
 set cmdheight=2
-" set updatetime=300
 set shortmess+=c
-" set signcolumn=yes
 
 " Use tab for trigger completion with characters ahead and navigate.
 " Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
@@ -236,18 +218,14 @@ function! s:check_back_space() abort
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
-" Use <F1> to trigger completion.
-inoremap <silent><expr> <C-\> coc#refresh()
+" Use <F5> to trigger completion.
+inoremap <silent><expr> <F5> coc#refresh()
 
 " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
 " Coc only does snippet and additional edit on confirm.
 inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 " Or use `complete_info` if your vim support it, like:
 " inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
-
-" " Use `[g` and `]g` to navigate diagnostics
-" nmap <silent> [g <Plug>(coc-diagnostic-prev)
-" nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
 " Remap keys for gotos
 nmap <silent> gd <Plug>(coc-definition)
@@ -259,8 +237,9 @@ nmap <silent> gr <Plug>(coc-references)
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 
 function! s:show_documentation()
+  " type K twice to jump to the document
   if (coc#util#has_float())
-    execute 'wincmd w'
+    execute 'wincmd p'
   elseif (index(['vim','help'], &filetype) >= 0)
     execute 'h '.expand('<cword>')
   else
@@ -268,8 +247,8 @@ function! s:show_documentation()
   endif
 endfunction
 
-" " Remap for rename current word
-" nmap <leader>rn <Plug>(coc-rename)
+" Remap for rename current word
+nmap <F6> <Plug>(coc-rename)
 
 " Remap for format selected region
 xmap <leader>=  <Plug>(coc-format-selected)
@@ -285,33 +264,20 @@ augroup cocgroup
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
-" " Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
-" xmap <leader>a  <Plug>(coc-codeaction-selected)
-" nmap <leader>a  <Plug>(coc-codeaction-selected)
-
-" " Remap for do codeAction of current line
-" nmap <leader>ac  <Plug>(coc-codeaction)
-" " Fix autofix problem of current line
-" " nmap <leader>qf  <Plug>(coc-fix-current)
-
 " Create mappings for function text object, requires document symbols feature of languageserver.
 xmap if <Plug>(coc-funcobj-i)
 xmap af <Plug>(coc-funcobj-a)
 omap if <Plug>(coc-funcobj-i)
 omap af <Plug>(coc-funcobj-a)
 
-" Use <C-d> for select selections ranges, needs server support, like: coc-tsserver, coc-python
-" nmap <silent> <C-d> <Plug>(coc-range-select)
-" xmap <silent> <C-d> <Plug>(coc-range-select)
+" Use `:Format` to format current buffer
+command! -nargs=0 Format :call CocAction('format')
 
-" " Use `:Format` to format current buffer
-" command! -nargs=0 Format :call CocAction('format')
+" Use `:Fold` to fold current buffer
+command! -nargs=? Fold   :call CocAction('fold', <f-args>)
 
-" " Use `:Fold` to fold current buffer
-" command! -nargs=? Fold   :call CocAction('fold', <f-args>)
-
-" " use `:OR` for organize import of current buffer
-" command! -nargs=0 OR     :call CocAction('runCommand', 'editor.action.organizeImport')
+" use `:OR` for organize import of current buffer
+command! -nargs=0 OR     :call CocAction('runCommand', 'editor.action.organizeImport')
 
 " Add status line support, for integration with other plugin, checkout `:h coc-status`
 set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
@@ -355,8 +321,6 @@ augroup python
   autocmd FileType python let b:match_words = '\<if\>:\<elif\>:\<else\>'
   autocmd FileType python nnoremap <leader>bk :normal Oimport ipdb; ipdb.set_trace()<ESC>j
   autocmd FileType python nnoremap <leader>r :!python3 %<CR>
-  " autocmd FileType python call LC_config()
-  " autocmd FileType python call ncm2#enable_for_buffer()
 augroup END
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -388,11 +352,18 @@ augroup rstat
 augroup END
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Java {{{1
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+augroup Java
+  autocmd!
+  autocmd FileType java setlocal et ts=4 sts=4 sw=4
+augroup END
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Other utilities {{{1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 augroup mygroup
   autocmd!
-  autocmd FileType crontab setlocal nowritebackup
+  autocmd FileType crontab setlocal backupcopy="yes"
   autocmd FileType json syntax match Comment +\/\/.\+$+
 augroup END
 
