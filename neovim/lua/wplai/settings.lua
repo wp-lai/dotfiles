@@ -1,6 +1,5 @@
 -- alias
 local o = vim.opt
-local cmd = vim.cmd
 local g = vim.g
 
 -- global options
@@ -21,7 +20,7 @@ o.expandtab = true
 o.relativenumber = true
 o.number = true
 o.wrap = false
-o.colorcolumn = "80"
+-- o.colorcolumn = "80"
 o.foldlevel = 99 -- unfold when open
 o.signcolumn = "yes"
 o.undofile = true
@@ -42,6 +41,3 @@ g.netrw_liststyle = 3
 g.loaded_python_provider = 0
 g.python_host_prog = "/usr/bin/python2"
 g.python3_host_prog = "/usr/local/bin/python"
-
--- -- theme
--- cmd "colorscheme gruvbox-material"

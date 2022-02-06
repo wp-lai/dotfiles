@@ -87,36 +87,36 @@ gls.left[7] = {
 	},
 }
 
-gls.left[8] = {
-	DiagnosticError = {
-		provider = "DiagnosticError",
-		icon = "  ",
-		highlight = { colors.red, colors.bg },
-	},
-}
-gls.left[9] = {
-	DiagnosticWarn = {
-		provider = "DiagnosticWarn",
-		icon = "  ",
-		highlight = { colors.yellow, colors.bg },
-	},
-}
-
-gls.left[10] = {
-	DiagnosticHint = {
-		provider = "DiagnosticHint",
-		icon = "  ",
-		highlight = { colors.cyan, colors.bg },
-	},
-}
-
-gls.left[11] = {
-	DiagnosticInfo = {
-		provider = "DiagnosticInfo",
-		icon = "  ",
-		highlight = { colors.blue, colors.bg },
-	},
-}
+-- gls.left[8] = {
+-- 	DiagnosticError = {
+-- 		provider = "DiagnosticError",
+-- 		icon = "  ",
+-- 		highlight = { colors.red, colors.bg },
+-- 	},
+-- }
+-- gls.left[9] = {
+-- 	DiagnosticWarn = {
+-- 		provider = "DiagnosticWarn",
+-- 		icon = "  ",
+-- 		highlight = { colors.yellow, colors.bg },
+-- 	},
+-- }
+--
+-- gls.left[10] = {
+-- 	DiagnosticHint = {
+-- 		provider = "DiagnosticHint",
+-- 		icon = "  ",
+-- 		highlight = { colors.cyan, colors.bg },
+-- 	},
+-- }
+--
+-- gls.left[11] = {
+-- 	DiagnosticInfo = {
+-- 		provider = "DiagnosticInfo",
+-- 		icon = "  ",
+-- 		highlight = { colors.blue, colors.bg },
+-- 	},
+-- }
 
 gls.mid[1] = {
 	ShowLspClient = {

@@ -17,12 +17,12 @@ return require("packer").startup({
 			config = function()
 				vim.api.nvim_exec(
 					[[
-            augroup Packer
+          augroup packer_user_config
             autocmd!
             autocmd BufWritePost plugins.lua source <afile> | PackerCompile
             autocmd User PackerCompileDone echom 'PackerCompile done'
-            augroup end
-            ]],
+          augroup end
+          ]],
 					false
 				)
 			end,
@@ -36,7 +36,13 @@ return require("packer").startup({
 				vim.g.gruvbox_material_better_performance = 1
 			end,
 			config = function()
-				vim.cmd([[colorscheme gruvbox-material]])
+				-- vim.cmd([[colorscheme gruvbox-material]])
+			end,
+		})
+		use({
+			"rebelot/kanagawa.nvim",
+			config = function()
+				vim.cmd("colorscheme kanagawa")
 			end,
 		})
 
@@ -202,17 +208,23 @@ return require("packer").startup({
 		use({
 			"numToStr/Comment.nvim",
 			config = function()
-				require("Comment").setup({
-					pre_hook = function(ctx)
-						return require("ts_context_commentstring.internal").calculate_commentstring()
-					end,
-				})
+				require("Comment").setup({})
+				local comment_ft = require("Comment.ft")
+				comment_ft.solidity = { "// %s", "/*%s*/" }
+			end,
+		})
+
+		use({
+			"folke/todo-comments.nvim",
+			requires = "nvim-lua/plenary.nvim",
+			config = function()
+				require("todo-comments").setup({})
 			end,
 		})
 
 		use({
 			"mhartington/formatter.nvim",
-			ft = { "go", "lua", "rust", "javascript", "json", "solidity" },
+			ft = { "go", "lua", "rust", "javascript", "typescript", "json", "solidity" },
 			config = function()
 				local prettier = function()
 					return {
@@ -225,6 +237,7 @@ return require("packer").startup({
 					logging = false,
 					filetype = {
 						javascript = { prettier },
+						typescript = { prettier },
 						json = { prettier },
 						-- npm install -g prettier-plugin-solidity
 						solidity = { prettier },
@@ -238,16 +251,6 @@ return require("packer").startup({
 								}
 							end,
 						},
-						-- lua = {
-						--   -- luafmt
-						--   function()
-						--     return {
-						--       exe = "luafmt",
-						--       args = {"--indent-count", 2, "--stdin"},
-						--       stdin = true
-						--     }
-						--   end
-						-- },
 						lua = {
 							-- luafmt
 							function()
@@ -383,11 +386,9 @@ return require("packer").startup({
 		-- language server
 		use({
 			"neovim/nvim-lspconfig",
-			ft = { "go", "lua", "javascript", "html", "css", "json", "typescript" },
+			ft = { "go", "rust", "lua", "javascript", "html", "css", "json", "typescript" },
 			config = [[ require"wplai.lsp" ]],
 		})
-
-		use({ "ray-x/lsp_signature.nvim" })
 
 		use({
 			"simrat39/symbols-outline.nvim",
@@ -406,30 +407,10 @@ return require("packer").startup({
 			config = [[ require("wplai.snippet") ]],
 		})
 
-		-- debug
-		-- use({
-		-- 	"sebdah/vim-delve",
-		-- 	ft = { "go" },
-		-- })
-		-- use({
-		-- 	"mfussenegger/nvim-dap",
-		-- 	disable = true,
-		-- 	ft = "go",
-		-- 	config = [[require("wplai.dap")]],
-		-- })
-		-- use({
-		-- 	"rcarriga/nvim-dap-ui",
-		-- 	disable = true,
-		-- 	config = function()
-		-- 		require("dapui").setup()
-		-- 		vim.api.nvim_set_keymap("n", "<leader>dp", ":lua require('dapui').toggle()<CR>", { noremap = true })
-		-- 	end,
-		-- })
-
 		-- linter
 		use({
 			"mfussenegger/nvim-lint",
-			ft = "go",
+			ft = { "go", "rust" },
 			disable = true,
 			config = function()
 				require("lint").linters_by_ft = {
@@ -446,11 +427,12 @@ return require("packer").startup({
 
 		use({
 			"dense-analysis/ale",
+			disable = true,
 			ft = "solidity",
-      setup = function()
-        vim.g.ale_solidity_solc_options = '--base-path . --include-path node_modules/'
-        -- vim.g.ale_solidity_solc_executable = '/Users/wplai/Library/Caches/hardhat-nodejs/compilers/macosx-amd64/solc-macosx-amd64-v0.8.9+commit.e5eed63a'
-      end,
+			setup = function()
+				vim.g.ale_solidity_solc_options = "--base-path . --include-path node_modules/"
+				-- vim.g.ale_solidity_solc_executable = '/Users/wplai/Library/Caches/hardhat-nodejs/compilers/macosx-amd64/solc-macosx-amd64-v0.8.9+commit.e5eed63a'
+			end,
 		})
 
 		use({
@@ -572,6 +554,7 @@ return require("packer").startup({
 		-- solidity
 		use({
 			"tomlion/vim-solidity",
+			ft = "solidity",
 		})
 
 		-- git
@@ -587,16 +570,4 @@ return require("packer").startup({
 			end,
 		})
 	end,
-
-	config = {
-		display = {
-			open_fn = function()
-				return require("packer.util").float({ border = "rounded" })
-			end,
-		},
-		profile = {
-			enable = true,
-			threshold = 1,
-		},
-	},
 })

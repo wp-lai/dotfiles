@@ -125,8 +125,6 @@ sign define DiagnosticSignHint text=💡 linehl= texthl=DiagnosticSignHint numhl
 
 local nvim_lsp = require("lspconfig")
 local on_attach = function(_client, bufnr)
-	require("lsp_signature").on_attach()
-
 	vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
 
 	local opts = { noremap = true, silent = true }
@@ -149,8 +147,8 @@ local on_attach = function(_client, bufnr)
 	-- vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
 	-- vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
 	-- vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>cd", "<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>", opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "[d", "<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>", opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "]d", "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", opts)
+	vim.api.nvim_buf_set_keymap(bufnr, "n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>", opts)
+	vim.api.nvim_buf_set_keymap(bufnr, "n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>", opts)
 	-- vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
 
 	-- print('LSP attached.')
@@ -161,7 +159,7 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
 
-local servers = { "tsserver", "html", "cssls", "eslint" }
+local servers = { "tsserver", "html", "cssls" }
 for _, lsp in ipairs(servers) do
 	nvim_lsp[lsp].setup({
 		on_attach = on_attach,
@@ -188,12 +186,36 @@ nvim_lsp.gopls.setup({
 	},
 })
 
+-- rust
+nvim_lsp.rust_analyzer.setup({
+	on_attach = on_attach,
+	capabilities = capabilities,
+	flags = { debounce_text_changes = 150 },
+	settings = {
+		["rust-analyzer"] = {
+			checkOnSave = {
+				allFeatures = true,
+				overrideCommand = {
+					"cargo",
+					"clippy",
+					"--workspace",
+					"--message-format=json",
+					"--all-targets",
+					"--all-features",
+				},
+			},
+		},
+	},
+})
+
 -- solidity
 nvim_lsp.solang.setup({
 	on_attach = on_attach,
 	capabilities = capabilities,
 	flags = { debounce_text_changes = 150 },
-	cmd = { "solang", "--language-server", "--target", "solana" },
+	cmd = { "solc", "--lsp" },
+	filetypes = { "solidity" },
+	root_dir = nvim_lsp.util.root_pattern(".git", "hardhat.config.ts", "hardhat.config.js"),
 })
 
 -- json
@@ -212,28 +234,32 @@ nvim_lsp.jsonls.setup({
 })
 
 -- lua language-server
-local sumneko_root_path = vim.fn.getenv("HOME") .. "/.config/nvim/lsp-servers/lua-language-server/"
-local sumneko_binary_path = "/bin/macOS/lua-language-server"
+local runtime_path = vim.split(package.path, ";")
+table.insert(runtime_path, "lua/?.lua")
+table.insert(runtime_path, "lua/?/init.lua")
 nvim_lsp.sumneko_lua.setup({
-	cmd = { sumneko_root_path .. sumneko_binary_path, "-E", sumneko_root_path .. "/main.lua" },
 	on_attach = on_attach,
 	capabilities = capabilities,
 	flags = { debounce_text_changes = 150 },
 	settings = {
 		Lua = {
 			runtime = {
+				-- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
 				version = "LuaJIT",
-				path = vim.split(package.path, ";"),
+				-- Setup your lua path
+				path = runtime_path,
 			},
 			diagnostics = {
+				-- Get the language server to recognize the `vim` global
 				globals = { "vim" },
 			},
 			workspace = {
 				-- Make the server aware of Neovim runtime files
-				library = {
-					[vim.fn.expand("$VIMRUNTIME/lua")] = true,
-					[vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
-				},
+				library = vim.api.nvim_get_runtime_file("", true),
+			},
+			-- Do not send telemetry data containing a randomized but unique identifier
+			telemetry = {
+				enable = false,
 			},
 		},
 	},
