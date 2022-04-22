@@ -1,0 +1,31 @@
+# format = """
+# $username\
+# $hostname\
+# $shlvl\
+# $kubernetes\
+# $directory\
+# $vcsh\
+# $git_branch\
+# $git_commit\
+# $git_state\
+# $git_status\
+# $package\
+# $cmd_duration
+# $character"""
+format = "$all"
+
+command_timeout = 1000
+
+[character]
+success_symbol = "🤙"
+error_symbol = "🤨"
+
+# Disable the package module, hiding it from the prompt completely
+# [package]
+# disabled = true
+
+[golang]
+symbol = " "
+
+[directory]
+fish_style_pwd_dir_length=1
