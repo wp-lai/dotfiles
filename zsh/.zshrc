@@ -29,6 +29,12 @@ path() {
 # export GO111MODULE=on
 
 #####################
+# python            #
+#####################
+export PATH="$PATH:$HOME/Library/Python/3.8/bin/"
+
+
+#####################
 # Rust SETTINGS     #
 #####################
 # export PATH=$PATH:$HOME/.cargo/bin

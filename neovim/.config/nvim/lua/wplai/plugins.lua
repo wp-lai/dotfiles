@@ -31,7 +31,7 @@ return require("packer").startup({
 		-- aesthetics
 		use({
 			"sainnhe/gruvbox-material",
-      disable=true,
+			disable = true,
 			setup = function()
 				vim.o.termguicolors = true
 				vim.g.gruvbox_material_better_performance = 1
@@ -42,7 +42,7 @@ return require("packer").startup({
 		})
 		use({
 			"rebelot/kanagawa.nvim",
-      disable=true,
+			disable = true,
 			config = function()
 				-- vim.cmd("colorscheme kanagawa")
 			end,
@@ -134,6 +134,7 @@ return require("packer").startup({
 
 		-- optimization
 		use({ "nathom/filetype.nvim" })
+		use({ "lewis6991/impatient.nvim" })
 
 		-- utilities
 		use({
@@ -161,6 +162,19 @@ return require("packer").startup({
 					update_cwd = true,
 				})
 				vim.api.nvim_set_keymap("n", "<C-p>", ":NvimTreeToggle<cr>", { noremap = true, silent = true })
+			end,
+		})
+
+		use({
+			"JoseConseco/iswap.nvim",
+			config = function()
+				vim.api.nvim_set_keymap("n", "<m-h>", "<cmd>ISwapCursorNodeLeft<CR>", { noremap = true, silent = true }) -- move cursor node right
+				vim.api.nvim_set_keymap(
+					"n",
+					"<m-l>",
+					"<cmd>ISwapCursorNodeRight<CR>",
+					{ noremap = true, silent = true }
+				) -- move cursor node left
 			end,
 		})
 
@@ -306,7 +320,7 @@ return require("packer").startup({
 		-- telescope
 		use({
 			"nvim-telescope/telescope.nvim",
-			requires = { { "nvim-lua/plenary.nvim" } },
+			requires = "nvim-lua/plenary.nvim",
 			config = [[ require("wplai.telescope") ]],
 		})
 		use({
@@ -474,7 +488,7 @@ return require("packer").startup({
 			"NTBBloodbath/rest.nvim",
 			disable = true,
 			ft = "http",
-			requires = { "nvim-lua/plenary.nvim" },
+			requires = "nvim-lua/plenary.nvim",
 			config = function()
 				require("rest-nvim").setup()
 			end,
