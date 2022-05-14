@@ -176,7 +176,7 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
 
-local servers = { "tsserver", "html", "cssls" }
+local servers = { "html", "cssls" }
 for _, lsp in ipairs(servers) do
 	nvim_lsp[lsp].setup({
 		on_attach = on_attach,
@@ -208,6 +208,7 @@ nvim_lsp.rust_analyzer.setup({
 	on_attach = on_attach,
 	capabilities = capabilities,
 	flags = { debounce_text_changes = 150 },
+	root_dir = nvim_lsp.util.root_pattern("Cargo.toml", "rust-project.json"),
 	settings = {
 		["rust-analyzer"] = {
 			assist = {
@@ -255,6 +256,25 @@ nvim_lsp.jsonls.setup({
 				url = "https://json.schemastore.org/package.json",
 			},
 		},
+	},
+})
+
+-- tsserver
+nvim_lsp.tsserver.setup {
+  on_attach = on_attach,
+  root_dir = nvim_lsp.util.root_pattern("package.json"),
+  init_options = {
+    lint = true,
+  }
+}
+
+
+-- deno
+nvim_lsp.denols.setup({
+	on_attach = on_attach,
+  root_dir = nvim_lsp.util.root_pattern("deno.json"),
+	init_options = {
+		lint = true,
 	},
 })
 

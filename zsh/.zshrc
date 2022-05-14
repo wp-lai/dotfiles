@@ -8,8 +8,7 @@ export VISUAL=$EDITOR
 # ALIASES           #
 #####################
 alias v='nvim'
-alias ll='exa -l --group-directories-first'
-alias l='exa -l --git --icons --classify --group-directories-first --time-style=long-iso --group --color-scale'
+alias ll='exa -l --git --icons --classify --group-directories-first --time-style=long-iso --group --color-scale'
 alias g='git'
 alias t='tmux new-session \; split-window -h \; split-window -v \; attach'
 alias ta='tmux attach -t '
@@ -31,8 +30,7 @@ path() {
 #####################
 # python            #
 #####################
-export PATH="$PATH:$HOME/Library/Python/3.8/bin/"
-
+# export PATH="$PATH:$HOME/Library/Python/3.8/bin/"
 
 #####################
 # Rust SETTINGS     #
@@ -71,6 +69,7 @@ _fzf_comprun() {
         *)            fzf "$@" ;;
     esac
 }
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 
 #####################
@@ -147,9 +146,7 @@ load-nvmrc
 #####################
 export PATH="$PATH:/Users/wplai/.foundry/bin"
 foundry_shell_completion() {
-    echo "update forge shell completion"
     forge completions zsh > ~/.zfunc/_forge
-    echo "update cast shell completion"
     cast completions zsh > ~/.zfunc/_cast
 }
 alias foundryup="foundryup && foundry_shell_completion"
@@ -157,10 +154,14 @@ alias foundryup="foundryup && foundry_shell_completion"
 #####################
 # miscellaneous     #
 #####################
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 eval "$(zoxide init zsh --cmd z)"
 eval "$(mcfly init zsh)"
 eval "$(starship init zsh)"
 
 export BAT_THEME="gruvbox-dark"
 
+# tabtab source for packages
+# uninstall by removing these lines
+[[ -f ~/.config/tabtab/zsh/__tabtab.zsh ]] && . ~/.config/tabtab/zsh/__tabtab.zsh || true
+
+source "$HOME/private.zsh"

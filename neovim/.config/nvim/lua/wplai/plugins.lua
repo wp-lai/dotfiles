@@ -394,9 +394,10 @@ return require("packer").startup({
 			config = [[ require"wplai.lsp" ]],
 		})
 
+		-- outline
 		use({
 			"simrat39/symbols-outline.nvim",
-			ft = { "go", "lua", "javascript" },
+			ft = { "go", "rust", "lua", "javascript", "typescript", "solidity" },
 			setup = function()
 				vim.g.symbols_outline = { keymaps = { close = "q" } }
 			end,
