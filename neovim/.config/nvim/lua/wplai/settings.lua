@@ -22,6 +22,8 @@ o.number = true
 o.wrap = false
 -- o.colorcolumn = "80"
 o.foldlevel = 99 -- unfold when open
+-- o.foldcolumn = '1'
+o.foldenable = true
 o.signcolumn = "yes"
 o.undofile = true
 o.undodir = vim.fn.stdpath("data") .. "/undo/"
@@ -29,8 +31,9 @@ o.pumblend = 10 -- enable transparency for the popup-menu
 o.inccommand = "nosplit" -- preview the effects of command
 o.iskeyword:prepend({ "-" }) -- treat dash separated words as a word textobject
 o.termguicolors = true
+o.laststatus = 3
 
-o.completeopt = {"menu", "menuone", "noselect"}
+o.completeopt = { "menu", "menuone", "noselect" }
 o.shortmess:append({ c = true })
 
 -- netrw

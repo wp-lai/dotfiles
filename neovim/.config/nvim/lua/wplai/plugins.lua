@@ -27,6 +27,7 @@ return require("packer").startup({
 				)
 			end,
 		})
+		use("nvim-lua/plenary.nvim")
 
 		-- aesthetics
 		use({
@@ -49,10 +50,44 @@ return require("packer").startup({
 		})
 		use({
 			"rmehri01/onenord.nvim",
+			disable = true,
 			config = function()
 				vim.cmd("colorscheme onenord")
 				vim.cmd([[highlight Normal guibg=none]])
 				vim.cmd([[highlight NoneText guibg=none]])
+			end,
+		})
+		use({
+			"catppuccin/nvim",
+			as = "catppuccin",
+			run = ":CatppuccinCompile",
+			config = function()
+				require("catppuccin").setup({
+					transparent_background = true,
+					dim_inactive = {
+						enabled = true,
+						shade = "dark",
+						percentage = 0.15,
+					},
+					compile = {
+						enabled = true,
+						path = vim.fn.stdpath("cache") .. "/catppuccin",
+						suffix = "_compiled",
+					},
+				})
+				vim.g.catppuccin_flavour = "frappe" -- latte, frappe, macchiato, mocha
+				vim.cmd([[colorscheme catppuccin]])
+			end,
+		})
+
+		use({
+			"hood/popui.nvim",
+			requires = {
+				"RishabhRD/popfix",
+			},
+			config = function()
+				vim.ui.select = require("popui.ui-overrider")
+				vim.ui.input = require("popui.input-overrider")
 			end,
 		})
 
@@ -164,6 +199,41 @@ return require("packer").startup({
 				vim.api.nvim_set_keymap("n", "<C-p>", ":NvimTreeToggle<cr>", { noremap = true, silent = true })
 			end,
 		})
+		use({
+			"kevinhwang91/nvim-ufo",
+			requires = "kevinhwang91/promise-async",
+			config = function()
+				require("ufo").setup({
+					fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
+						local newVirtText = {}
+						local suffix = ("  %d "):format(endLnum - lnum)
+						local sufWidth = vim.fn.strdisplaywidth(suffix)
+						local targetWidth = width - sufWidth
+						local curWidth = 0
+						for _, chunk in ipairs(virtText) do
+							local chunkText = chunk[1]
+							local chunkWidth = vim.fn.strdisplaywidth(chunkText)
+							if targetWidth > curWidth + chunkWidth then
+								table.insert(newVirtText, chunk)
+							else
+								chunkText = truncate(chunkText, targetWidth - curWidth)
+								local hlGroup = chunk[2]
+								table.insert(newVirtText, { chunkText, hlGroup })
+								chunkWidth = vim.fn.strdisplaywidth(chunkText)
+								-- str width returned from truncate() may less than 2nd argument, need padding
+								if curWidth + chunkWidth < targetWidth then
+									suffix = suffix .. (" "):rep(targetWidth - curWidth - chunkWidth)
+								end
+								break
+							end
+							curWidth = curWidth + chunkWidth
+						end
+						table.insert(newVirtText, { suffix, "MoreMsg" })
+						return newVirtText
+					end,
+				})
+			end,
+		})
 
 		use({
 			"JoseConseco/iswap.nvim",
@@ -175,6 +245,14 @@ return require("packer").startup({
 					"<cmd>ISwapCursorNodeRight<CR>",
 					{ noremap = true, silent = true }
 				) -- move cursor node left
+			end,
+		})
+
+		-- marks
+		use({
+			"chentoast/marks.nvim",
+			config = function()
+				require("marks").setup()
 			end,
 		})
 
@@ -239,6 +317,7 @@ return require("packer").startup({
 		use({
 			"folke/todo-comments.nvim",
 			requires = "nvim-lua/plenary.nvim",
+			disable = true,
 			config = function()
 				require("todo-comments").setup({})
 			end,
@@ -246,7 +325,17 @@ return require("packer").startup({
 
 		use({
 			"mhartington/formatter.nvim",
-			ft = { "go", "lua", "rust", "javascript", "typescript", "json", "solidity" },
+			ft = {
+				"go",
+				"lua",
+				"rust",
+				"javascript",
+				"typescript",
+				"json",
+				"solidity",
+				"javascriptreact",
+				"typescriptreact",
+			},
 			config = function()
 				local prettier = function()
 					return {
@@ -260,6 +349,8 @@ return require("packer").startup({
 					filetype = {
 						javascript = { prettier },
 						typescript = { prettier },
+						javascriptreact = { prettier },
+						typescriptreact = { prettier },
 						json = { prettier },
 						-- npm install -g prettier-plugin-solidity
 						solidity = { prettier },
@@ -268,7 +359,7 @@ return require("packer").startup({
 							function()
 								return {
 									exe = "rustfmt",
-									args = { "--emit=stdout" },
+									args = { "--emit=stdout --edition=2021" },
 									stdin = true,
 								}
 							end,
@@ -366,6 +457,9 @@ return require("packer").startup({
 				{
 					"JoosepAlviste/nvim-ts-context-commentstring",
 				},
+				{
+					"nvim-treesitter/nvim-treesitter-context",
+				},
 			},
 		})
 
@@ -379,8 +473,8 @@ return require("packer").startup({
 				"hrsh7th/cmp-path",
 				"hrsh7th/cmp-cmdline",
 				"hrsh7th/cmp-nvim-lsp-document-symbol",
+				"hrsh7th/cmp-nvim-lsp-signature-help",
 				"lukas-reineke/cmp-rg",
-				"onsails/lspkind-nvim",
 				"saadparwaiz1/cmp_luasnip",
 				"ray-x/cmp-treesitter",
 			},
@@ -390,8 +484,26 @@ return require("packer").startup({
 		-- language server
 		use({
 			"neovim/nvim-lspconfig",
-			ft = { "go", "rust", "lua", "javascript", "html", "css", "json", "typescript", "solidity" },
+			ft = {
+				"go",
+				"rust",
+				"lua",
+				"javascript",
+				"html",
+				"css",
+				"json",
+				"typescript",
+				"solidity",
+				"typescriptreact",
+				"javascriptreact",
+			},
 			config = [[ require"wplai.lsp" ]],
+		})
+		use({
+			"j-hui/fidget.nvim",
+			config = function()
+				require("fidget").setup({})
+			end,
 		})
 
 		-- outline
@@ -478,6 +590,186 @@ return require("packer").startup({
 			end,
 		})
 
+		-- Rust
+		use({
+			"simrat39/rust-tools.nvim",
+			ft = "rust",
+			config = function()
+				local rust_opts = {
+					server = {
+						standalone = false,
+						on_attach = function(client, bufnr)
+							vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
+							local opts = { noremap = true, silent = true }
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"gd",
+								"<cmd>lua vim.lsp.buf.declaration()<cr>",
+								opts
+							)
+							vim.api.nvim_buf_set_keymap(bufnr, "n", "gD", "<cmd>lua vim.lsp.buf.definition()<cr>", opts)
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"<C-]>",
+								"<cmd>lua vim.lsp.buf.implementation()<CR>",
+								opts
+							)
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"K",
+								"<cmd>lua require'rust-tools.hover_actions'.hover_actions()",
+								opts
+							)
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"<C-k>",
+								"<cmd>lua vim.lsp.buf.signature_help()<CR>",
+								opts
+							)
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"<leader>wa",
+								"<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>",
+								opts
+							)
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"<leader>wr",
+								"<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>",
+								opts
+							)
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"<leader>wl",
+								"<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>",
+								opts
+							)
+
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"gD",
+								"<cmd>lua vim.lsp.buf.declaration()<CR>",
+								opts
+							)
+							vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
+							vim.api.nvim_buf_set_keymap(bufnr, "n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"gi",
+								"<cmd>lua vim.lsp.buf.implementation()<CR>",
+								opts
+							)
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"<C-k>",
+								"<cmd>lua vim.lsp.buf.signature_help()<CR>",
+								opts
+							)
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"<space>wa",
+								"<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>",
+								opts
+							)
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"<space>wr",
+								"<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>",
+								opts
+							)
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"<space>wl",
+								"<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>",
+								opts
+							)
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"<space>D",
+								"<cmd>lua vim.lsp.buf.type_definition()<CR>",
+								opts
+							)
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"<space>rn",
+								"<cmd>lua vim.lsp.buf.rename()<CR>",
+								opts
+							)
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"<space>ca",
+								"<cmd>lua vim.lsp.buf.code_action()<CR>",
+								opts
+							)
+							vim.api.nvim_buf_set_keymap(bufnr, "n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"<space>f",
+								"<cmd>lua vim.lsp.buf.formatting()<CR>",
+								opts
+							)
+
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"<space>e",
+								"<cmd>lua vim.diagnostic.open_float()<CR>",
+								opts
+							)
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"[d",
+								"<cmd>lua vim.diagnostic.goto_prev()<CR>",
+								opts
+							)
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"]d",
+								"<cmd>lua vim.diagnostic.goto_next()<CR>",
+								opts
+							)
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"<space>q",
+								"<cmd>lua vim.diagnostic.setloclist()<CR>",
+								opts
+							)
+
+							vim.api.nvim_buf_set_keymap(
+								bufnr,
+								"n",
+								"<space>rr",
+								"<cmd>lua require('rust-tools.runnables').runnables()<CR>",
+								opts
+							)
+						end,
+					},
+				}
+
+				require("rust-tools").setup(rust_opts)
+			end,
+		})
+
 		-- json
 		use({
 			"gennaro-tedesco/nvim-jqx",
@@ -502,7 +794,7 @@ return require("packer").startup({
 			disable = true,
 			config = function()
 				require("package-info").setup({
-					package_manager = "npm",
+					package_manager = "pnpm",
 				})
 				-- Show package versions
 				vim.api.nvim_set_keymap(
@@ -571,7 +863,58 @@ return require("packer").startup({
 				"nvim-lua/plenary.nvim",
 			},
 			config = function()
-				require("gitsigns").setup()
+				require("gitsigns").setup({
+					on_attach = function(bufnr)
+						local gs = package.loaded.gitsigns
+
+						local function map(mode, l, r, opts)
+							opts = opts or {}
+							opts.buffer = bufnr
+							vim.keymap.set(mode, l, r, opts)
+						end
+
+						-- Navigation
+						map("n", "]c", function()
+							if vim.wo.diff then
+								return "]c"
+							end
+							vim.schedule(function()
+								gs.next_hunk()
+							end)
+							return "<Ignore>"
+						end, { expr = true })
+
+						map("n", "[c", function()
+							if vim.wo.diff then
+								return "[c"
+							end
+							vim.schedule(function()
+								gs.prev_hunk()
+							end)
+							return "<Ignore>"
+						end, { expr = true })
+
+						-- Actions
+						map({ "n", "v" }, "<leader>hs", ":Gitsigns stage_hunk<CR>")
+						map({ "n", "v" }, "<leader>hr", ":Gitsigns reset_hunk<CR>")
+						map("n", "<leader>hS", gs.stage_buffer)
+						map("n", "<leader>hu", gs.undo_stage_hunk)
+						map("n", "<leader>hR", gs.reset_buffer)
+						map("n", "<leader>hp", gs.preview_hunk)
+						map("n", "<leader>hb", function()
+							gs.blame_line({ full = true })
+						end)
+						map("n", "<leader>tb", gs.toggle_current_line_blame)
+						map("n", "<leader>hd", gs.diffthis)
+						map("n", "<leader>hD", function()
+							gs.diffthis("~")
+						end)
+						map("n", "<leader>td", gs.toggle_deleted)
+
+						-- Text object
+						map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>")
+					end,
+				})
 			end,
 		})
 	end,

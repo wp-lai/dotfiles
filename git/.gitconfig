@@ -4,3 +4,17 @@
 	email = techwplai@gmail.com
 [init]
 	defaultBranch = main
+[core]
+    pager = delta
+[interactive]
+    diffFilter = delta --color-only
+[delta]
+    light = false
+    side-by-side = true
+[merge]
+    confilictstyle = diff3
+[diff]
+    colorMoved = default
+
+[alias]
+	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit

@@ -16,21 +16,35 @@ alias ta='tmux attach -t '
 #####################
 # funcs             #
 #####################
-path() {
+function path() {
     echo $PATH | tr : '\n'
+}
+
+function rg() {
+  command rg --pretty "$@" | less --RAW-CONTROL-CHARS
+}
+
+function stream() {
+    curl https://gateway.ceramic.network/api/v0/streams/$1 | jq
 }
 
 #####################
 # GO SETTINGS       #
 #####################
-# export GOPATH=$HOME/go
-# export PATH="$PATH:$(go env GOPATH)/bin"
-# export GO111MODULE=on
+export GOPATH=$HOME/go
+export PATH="$PATH:$(go env GOPATH)/bin"
+export GO111MODULE=on
 
 #####################
 # python            #
 #####################
-# export PATH="$PATH:$HOME/Library/Python/3.8/bin/"
+export PATH="$PATH:$HOME/Library/Python/3.8/bin"
+
+#####################
+# NPM               #
+#####################
+export PATH="$PATH:$HOME/.nvm/versions/node/v16.15.0/bin"
+
 
 #####################
 # Rust SETTINGS     #
@@ -152,6 +166,11 @@ foundry_shell_completion() {
 alias foundryup="foundryup && foundry_shell_completion"
 
 #####################
+# PostgreSQL        #
+#####################
+export PATH="$PATH:/Applications/Postgres.app/Contents/Versions/latest/bin"
+
+#####################
 # miscellaneous     #
 #####################
 eval "$(zoxide init zsh --cmd z)"
@@ -164,4 +183,13 @@ export BAT_THEME="gruvbox-dark"
 # uninstall by removing these lines
 [[ -f ~/.config/tabtab/zsh/__tabtab.zsh ]] && . ~/.config/tabtab/zsh/__tabtab.zsh || true
 
-source "$HOME/private.zsh"
+source "$HOME/.private.zsh"
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME/bin:$PATH"
+
+# # bun completions
+# [ -s "/Users/wplai/.bun/_bun" ] && source "/Users/wplai/.bun/_bun"
+#
+# # Bun
+# export BUN_INSTALL="/Users/wplai/.bun"
+# export PATH="$BUN_INSTALL/bin:$PATH"

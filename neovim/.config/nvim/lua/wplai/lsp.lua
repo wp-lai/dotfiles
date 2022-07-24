@@ -1,187 +1,53 @@
--- -- protocol symbols
--- vim.lsp.protocol.CompletionItemKind = {
--- 	"", -- Text
--- 	"", -- Method
--- 	"", -- Function
--- 	"", -- Constructor
--- 	"ﰠ", -- Field
--- 	"", -- Variable
--- 	"", -- Class
--- 	"", -- Interface
--- 	"", -- Module
--- 	"", -- Property
--- 	"", -- Unit
--- 	"", -- Value
--- 	"", -- Enum
--- 	"", -- Keyword
--- 	"", -- Snippet
--- 	"", -- Color
--- 	"", -- File
--- 	"", -- Reference
--- 	"", -- Folder
--- 	"", -- EnumMember
--- 	"", -- Constant
--- 	"", -- Struct
--- 	"⌘", -- Event
--- 	"", -- Operator
--- 	"", -- TypeParameter
--- }
---
--- -- options for lsp diagnostic
--- vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
--- 	underline = true,
--- 	signs = true,
--- 	update_in_insert = true,
--- 	virtual_text = {
--- 		true,
--- 		spacing = 6,
--- 		source = "always",
--- 		--severity_limit='Error'  -- Only show virtual text on error
--- 	},
--- })
-
--- -- go_to_definition in a split window
--- local function goto_definition(split_cmd)
--- 	local util = vim.lsp.util
--- 	local log = require("vim.lsp.log")
--- 	local api = vim.api
---
--- 	local handler = function(_, method, result)
--- 		-- stolen from $VIMRUNTIME/lua/vim/lsp/callbacks.lua
---
--- 		if result == nil or vim.tbl_isempty(result) then
--- 			local _ = log.info() and log.info(method, "No location found")
--- 			return nil
--- 		end
---
--- 		if split_cmd then
--- 			vim.cmd(split_cmd)
--- 		end
---
--- 		if vim.tbl_islist(result) then
--- 			util.jump_to_location(result[1])
---
--- 			if #result > 1 then
--- 				util.set_qflist(util.locations_to_items(result))
--- 				api.nvim_command("copen")
--- 				api.nvim_command("wincmd p")
--- 			end
--- 		else
--- 			util.jump_to_location(result)
--- 		end
--- 	end
---
--- 	return handler
--- end
---
--- vim.lsp.handlers["textDocument/definition"] = goto_definition("split")
-
--- vim.fn.sign_define("LspDiagnosticsSignError", {
--- 	text = "◉",
--- 	texthl = "LspDiagnosticsDefaultError",
--- 	numhl = "LspDiagnosticsDefaultError",
--- })
--- vim.fn.sign_define("LspDiagnosticsSignWarning", {
--- 	text = "●",
--- 	texthl = "LspDiagnosticsDefaultWarning",
--- 	numhl = "LspDiagnosticsDefaultWarning",
--- })
--- vim.fn.sign_define("LspDiagnosticsSignInformation", {
--- 	text = "•",
--- 	texthl = "LspDiagnosticsDefaultInformation",
--- 	numhl = "LspDiagnosticsDefaultInformation",
--- })
--- vim.fn.sign_define("LspDiagnosticsSignHint", {
--- 	text = "·",
--- 	texthl = "LspDiagnosticsDefaultHint",
--- 	numhl = "LspDiagnosticsDefaultHint",
--- })
--- vim.fn.sign_define("LightBulbSign", {
--- 	text = "◎",
--- 	texthl = "LightBulb",
--- 	linehl = "",
--- 	numhl = "",
--- })
-
--- -- se LSP diagnostic symbols/signs
--- vim.api.nvim_command(
--- 	[[ sign define LspDiagnosticsSignError         text=✗ texthl=LspDiagnosticsSignError       linehl= numhl= ]]
--- )
--- vim.api.nvim_command(
--- 	[[ sign define LspDiagnosticsSignWarning       text=⚠ texthl=LspDiagnosticsSignWarning     linehl= numhl= ]]
--- )
--- vim.api.nvim_command(
--- 	[[ sign define LspDiagnosticsSignInformation   text= texthl=LspDiagnosticsSignInformation linehl= numhl= ]]
--- )
--- vim.api.nvim_command(
--- 	[[ sign define LspDiagnosticsSignHint          text= texthl=LspDiagnosticsSignHint        linehl= numhl= ]]
--- )
---
--- vim.cmd([[
--- sign define DiagnosticSignError text= linehl= texthl=DiagnosticSignError numhl=
--- sign define DiagnosticSignWarn text= linehl= texthl=DiagnosticSignWarn numhl=
--- sign define DiagnosticSignInfo text= linehl= texthl=DiagnosticSignInfo numhl=
--- sign define DiagnosticSignHint text=💡 linehl= texthl=DiagnosticSignHint numhl= ]])
-
 local nvim_lsp = require("lspconfig")
+
+-- Mappings.
+-- See `:help vim.diagnostic.*` for documentation on any of the below functions
+local opts = { noremap = true, silent = true }
+vim.keymap.set("n", "<space>e", vim.diagnostic.open_float, opts)
+vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
+vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
+vim.keymap.set("n", "<space>q", vim.diagnostic.setloclist, opts)
+
 local on_attach = function(client, bufnr)
+	-- Enable completion triggered by <c-x><c-o>
 	vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
 
-	local opts = { noremap = true, silent = true }
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", "<cmd>lua vim.lsp.buf.declaration()<cr>", opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "gD", "<cmd>lua vim.lsp.buf.definition()<cr>", opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "<C-]>", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "K", "<Cmd>lua vim.lsp.buf.hover()<CR>", opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "<C-k>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>wa", "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>", opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>wr", "<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>", opts)
-	vim.api.nvim_buf_set_keymap(
-		bufnr,
-		"n",
-		"<leader>wl",
-		"<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>",
-		opts
-	)
-
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "<C-k>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "<space>wa", "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>", opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "<space>wr", "<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>", opts)
-	vim.api.nvim_buf_set_keymap(
-		bufnr,
-		"n",
-		"<space>wl",
-		"<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>",
-		opts
-	)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "<space>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "<space>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "<space>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
-
-	vim.api.nvim_set_keymap("n", "<space>e", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
-	vim.api.nvim_set_keymap("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>", opts)
-	vim.api.nvim_set_keymap("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>", opts)
-	vim.api.nvim_set_keymap("n", "<space>q", "<cmd>lua vim.diagnostic.setloclist()<CR>", opts)
+	-- Mappings.
+	-- See `:help vim.lsp.*` for documentation on any of the below functions
+	local bufopts = { noremap = true, silent = true, buffer = bufnr }
+	vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts)
+	vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
+	vim.keymap.set("n", "K", vim.lsp.buf.hover, bufopts)
+	vim.keymap.set("n", "<C-]>", vim.lsp.buf.implementation, bufopts)
+	vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, bufopts)
+	vim.keymap.set("n", "<space>wa", vim.lsp.buf.add_workspace_folder, bufopts)
+	vim.keymap.set("n", "<space>wr", vim.lsp.buf.remove_workspace_folder, bufopts)
+	vim.keymap.set("n", "<space>wl", function()
+		print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+	end, bufopts)
+	vim.keymap.set("n", "<space>D", vim.lsp.buf.type_definition, bufopts)
+	vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, bufopts)
+	vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action, bufopts)
+	vim.keymap.set("n", "gr", vim.lsp.buf.references, bufopts)
+	-- vim.keymap.set('n', '<space>f', vim.lsp.buf.formatting, bufopts)
 
 	-- print('LSP attached.')
 	vim.api.nvim_echo({ { "LSP attached." } }, false, {})
 end
 
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities.textDocument.completion.completionItem.snippetSupport = true
-capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
+-- local capabilities = vim.lsp.protocol.make_client_capabilities()
+-- capabilities.textDocument.completion.completionItem.snippetSupport = true
+-- capabilities.textDocument.foldingRange = {
+-- 	dynamicRegistration = false,
+-- 	lineFoldingOnly = true,
+-- }
+local capabilities = require("cmp_nvim_lsp").update_capabilities(vim.lsp.protocol.make_client_capabilities())
 
-local servers = { "html", "cssls" }
+local servers = { "html", "cssls", "graphql" }
 for _, lsp in ipairs(servers) do
 	nvim_lsp[lsp].setup({
 		on_attach = on_attach,
 		capabilities = capabilities,
-		flags = { debounce_text_changes = 150 },
 	})
 end
 
@@ -190,24 +56,12 @@ nvim_lsp.gopls.setup({
 	on_attach = on_attach,
 	capabilities = capabilities,
 	flags = { debounce_text_changes = 150 },
-	cmd = { "gopls", "serve" },
-	settings = {
-		gopls = {
-			experimentalPostfixCompletions = true,
-			analyses = {
-				unusedparams = true,
-				shadow = true,
-			},
-			staticcheck = true,
-		},
-	},
 })
 
 -- rust
 nvim_lsp.rust_analyzer.setup({
 	on_attach = on_attach,
 	capabilities = capabilities,
-	flags = { debounce_text_changes = 150 },
 	root_dir = nvim_lsp.util.root_pattern("Cargo.toml", "rust-project.json"),
 	settings = {
 		["rust-analyzer"] = {
@@ -260,23 +114,25 @@ nvim_lsp.jsonls.setup({
 })
 
 -- tsserver
-nvim_lsp.tsserver.setup {
-  on_attach = on_attach,
-  root_dir = nvim_lsp.util.root_pattern("package.json"),
-  init_options = {
-    lint = true,
-  }
-}
-
-
--- deno
-nvim_lsp.denols.setup({
+nvim_lsp.tsserver.setup({
 	on_attach = on_attach,
-  root_dir = nvim_lsp.util.root_pattern("deno.json"),
+	capabilities = capabilities,
 	init_options = {
 		lint = true,
+		hostInfo = "neovim",
 	},
 })
+
+nvim_lsp.eslint.setup({})
+
+-- -- deno
+-- nvim_lsp.denols.setup({
+-- 	on_attach = on_attach,
+-- 	root_dir = nvim_lsp.util.root_pattern("deno.json"),
+-- 	init_options = {
+-- 		lint = true,
+-- 	},
+-- })
 
 -- lua language-server
 -- local runtime_path = vim.split(package.path, ";")

@@ -1,6 +1,6 @@
 require("nvim-treesitter.configs").setup({
 	-- ensure_installed = { "go", "lua", "python", "c", "html", "javascript", "json", "toml", "solidity" },
-	ensure_installed = { "lua", "javascript", "rust", "solidity" },
+	ensure_installed = { "lua", "javascript", "typescript", "json", "rust", "solidity", "graphql" },
 	ignore_install = {},
 	highlight = {
 		enable = true,
@@ -69,23 +69,23 @@ require("nvim-treesitter.configs").setup({
 			enable = true,
 			set_jumps = true, -- whether to set jumps in the jumplist
 			goto_next_start = {
-				["]]"] = "@function.outer",
+				["]f"] = "@function.outer",
 				-- ["]]"] = "@class.outer"
-				["]a"] = "@parameter.inner",
+				-- ["]a"] = "@parameter.inner",
 			},
-			goto_next_end = {
-				["]["] = "@function.outer",
-				-- ["]["] = "@class.outer"
-			},
+			-- goto_next_end = {
+			-- 	["]["] = "@function.outer",
+			-- 	-- ["]["] = "@class.outer"
+			-- },
 			goto_previous_start = {
-				["[["] = "@function.outer",
+				["[f"] = "@function.outer",
 				-- ["[["] = "@class.outer"
-				["[a"] = "@parameter.inner",
+				-- ["[a"] = "@parameter.inner",
 			},
-			goto_previous_end = {
-				["[]"] = "@function.outer",
-				-- ["[]"] = "@class.outer"
-			},
+			-- goto_previous_end = {
+			-- 	["[]"] = "@function.outer",
+			-- 	-- ["[]"] = "@class.outer"
+			-- },
 		},
 		-- lsp_interop = {
 		-- 	enable = true,
