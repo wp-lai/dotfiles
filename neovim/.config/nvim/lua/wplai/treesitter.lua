@@ -1,6 +1,16 @@
 require("nvim-treesitter.configs").setup({
-	-- ensure_installed = { "go", "lua", "python", "c", "html", "javascript", "json", "toml", "solidity" },
-	ensure_installed = { "lua", "javascript", "typescript", "json", "rust", "solidity", "graphql" },
+	ensure_installed = {
+		"lua",
+		"javascript",
+		"typescript",
+		"json",
+		"rust",
+		"solidity",
+		"graphql",
+		"toml",
+		"go",
+		"html",
+	},
 	ignore_install = {},
 	highlight = {
 		enable = true,

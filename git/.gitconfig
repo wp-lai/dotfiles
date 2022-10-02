@@ -2,19 +2,34 @@
 [user]
 	name = wp-lai
 	email = techwplai@gmail.com
+
 [init]
 	defaultBranch = main
+
 [core]
     pager = delta
+	editor = nvim
+
 [interactive]
     diffFilter = delta --color-only
+
 [delta]
+    navigate = true
     light = false
     side-by-side = true
+
 [merge]
     confilictstyle = diff3
+
 [diff]
     colorMoved = default
 
 [alias]
 	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+	co = checkout
+	st = status
+	br = branch
+
+[pull]
+	rebase = true
+	ff = only

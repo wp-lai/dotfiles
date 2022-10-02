@@ -21,8 +21,10 @@ o.relativenumber = true
 o.number = true
 o.wrap = false
 -- o.colorcolumn = "80"
+o.foldenable = true
 o.foldlevel = 99 -- unfold when open
 -- o.foldcolumn = '1'
+o.foldlevelstart = -1
 o.foldenable = true
 o.signcolumn = "yes"
 o.undofile = true
@@ -43,4 +45,4 @@ g.netrw_liststyle = 3
 -- python
 g.loaded_python_provider = 0
 -- g.python_host_prog = "/usr/bin/python2"
-g.python3_host_prog = "/usr/local/bin/python3"
+g.python3_host_prog = "/usr/bin/python3"

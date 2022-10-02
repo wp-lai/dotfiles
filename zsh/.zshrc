@@ -12,6 +12,10 @@ alias ll='exa -l --git --icons --classify --group-directories-first --time-style
 alias g='git'
 alias t='tmux new-session \; split-window -h \; split-window -v \; attach'
 alias ta='tmux attach -t '
+alias lg='lazygit'
+alias rm='rm -i'
+
+alias gas='cast --to-unit `cast gas-price` gwei'
 
 #####################
 # funcs             #
@@ -40,11 +44,6 @@ export GO111MODULE=on
 #####################
 export PATH="$PATH:$HOME/Library/Python/3.8/bin"
 
-#####################
-# NPM               #
-#####################
-export PATH="$PATH:$HOME/.nvm/versions/node/v16.15.0/bin"
-
 
 #####################
 # Rust SETTINGS     #
@@ -68,7 +67,11 @@ export FZF_DEFAULT_OPTS="
 --pointer='|>'
 --marker='✓'
 --bind 'ctrl-e:execute(nvim {} < /dev/tty > /dev/tty 2>&1)' > selected
---bind 'ctrl-v:execute(code {})'"
+--bind 'ctrl-v:execute(code {})' \
+--color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796 \
+--color=fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6 \
+--color=marker:#f4dbd6,fg+:#cad3f5,prompt:#c6a0f6,hl+:#ed8796"
+
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2> /dev/null'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 _fzf_comprun() {
@@ -123,34 +126,6 @@ source <(antibody init)
 antibody bundle < ~/.zsh_plugins.txt
 
 #####################
-# NVM               #
-#####################
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-# call `nvm use` automatically whenever you enter a dir that contains `.nvmrc`
-autoload -U add-zsh-hook
-load-nvmrc() {
-  local node_version="$(nvm version)"
-  local nvmrc_path="$(nvm_find_nvmrc)"
-
-  if [ -n "$nvmrc_path" ]; then
-    local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
-
-    if [ "$nvmrc_node_version" = "N/A" ]; then
-      nvm install
-    elif [ "$nvmrc_node_version" != "$node_version" ]; then
-      nvm use
-    fi
-  elif [ "$node_version" != "$(nvm version default)" ]; then
-    echo "Reverting to nvm default version"
-    nvm use default
-  fi
-}
-add-zsh-hook chpwd load-nvmrc
-load-nvmrc
-
-#####################
 # yarn              #
 #####################
 # export PATH="$PATH:`yarn global bin`"
@@ -162,6 +137,7 @@ export PATH="$PATH:/Users/wplai/.foundry/bin"
 foundry_shell_completion() {
     forge completions zsh > ~/.zfunc/_forge
     cast completions zsh > ~/.zfunc/_cast
+    anvil completions zsh > ~/.zfunc/_anvil
 }
 alias foundryup="foundryup && foundry_shell_completion"
 
@@ -171,25 +147,22 @@ alias foundryup="foundryup && foundry_shell_completion"
 export PATH="$PATH:/Applications/Postgres.app/Contents/Versions/latest/bin"
 
 #####################
+# pnpm              #
+#####################
+export PNPM_HOME="/Users/wplai/Library/pnpm"
+export PATH="$PNPM_HOME:$PATH"
+
+#####################
 # miscellaneous     #
 #####################
 eval "$(zoxide init zsh --cmd z)"
 eval "$(mcfly init zsh)"
 eval "$(starship init zsh)"
 
-export BAT_THEME="gruvbox-dark"
+export BAT_THEME="Catppuccin-macchiato"
 
 # tabtab source for packages
 # uninstall by removing these lines
 [[ -f ~/.config/tabtab/zsh/__tabtab.zsh ]] && . ~/.config/tabtab/zsh/__tabtab.zsh || true
 
 source "$HOME/.private.zsh"
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
-
-# # bun completions
-# [ -s "/Users/wplai/.bun/_bun" ] && source "/Users/wplai/.bun/_bun"
-#
-# # Bun
-# export BUN_INSTALL="/Users/wplai/.bun"
-# export PATH="$BUN_INSTALL/bin:$PATH"
