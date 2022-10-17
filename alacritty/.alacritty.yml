@@ -118,7 +118,8 @@ font:
     #   - (Linux/BSD) monospace
     #   - (Windows) Consolas
     # family: Hack Nerd Font Mono
-    family: JetBrainsMono Nerd Font
+    # family: JetBrainsMono Nerd Font
+    family: MonoLisa Nerd Font Mono
     # family: Noto Emoji
 
     # The `style` can be specified to pick a specific face.
@@ -132,7 +133,7 @@ font:
     # value specified for the normal font.
     # family: Hack Nerd Font Mono
     # family: JetBrains Mono
-    family: JetBrainsMono Nerd Font
+    family: MonoLisa Nerd Font Mono
 
     # The `style` can be specified to pick a specific face.
     style: Bold
@@ -145,7 +146,7 @@ font:
     # value specified for the normal font.
     # family: Hack Nerd Font Mono
     # family: JetBrains Mono
-    family: JetBrainsMono Nerd Font
+    family: MonoLisa Nerd Font Mono
 
     # The `style` can be specified to pick a specific face.
     style: Italic
@@ -156,10 +157,10 @@ font:
     #
     # If the bold italic family is not specified, it will fall back to the
     # value specified for the normal font.
-    #family: monospace
+    family: MonoLisa Nerd Font Mono
 
     # The `style` can be specified to pick a specific face.
-    #style: Bold Italic
+    style: Bold Italic
 
   # Point size
   size: 14.0

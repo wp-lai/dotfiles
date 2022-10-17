@@ -41,7 +41,7 @@ end
 -- 	dynamicRegistration = false,
 -- 	lineFoldingOnly = true,
 -- }
-local capabilities = require("cmp_nvim_lsp").update_capabilities(vim.lsp.protocol.make_client_capabilities()) --nvim-cmp
+local capabilities = require("cmp_nvim_lsp").default_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 local servers = { "html", "cssls" }
@@ -72,15 +72,12 @@ nvim_lsp.gopls.setup({
 nvim_lsp.rust_analyzer.setup({
 	on_attach = on_attach,
 	capabilities = capabilities,
+	cmd = { "rustup", "run", "stable", "rust-analyzer" },
 	root_dir = nvim_lsp.util.root_pattern("Cargo.toml", "rust-project.json"),
 	settings = {
 		["rust-analyzer"] = {
 			cargo = { allFeatures = true },
 			checkOnSave = { allFeatures = true, command = "clippy" },
-			assist = {
-				importGranularity = "module",
-				importPrefix = "self",
-			},
 		},
 	},
 })

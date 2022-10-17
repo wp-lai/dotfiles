@@ -7,6 +7,7 @@ local has_words_before = function()
 end
 
 cmp.setup({
+	preselect = cmp.PreselectMode.None,
 	snippet = {
 		expand = function(args)
 			require("luasnip").lsp_expand(args.body)
@@ -23,13 +24,20 @@ cmp.setup({
 		["<C-y>"] = cmp.mapping.confirm({
 			select = false,
 		}),
+		["<CR>"] = cmp.mapping(function(fallback)
+			if cmp.visible() then
+				cmp.confirm({ select = false })
+			else
+				fallback()
+			end
+		end, { "i", "s" }),
 		["<Tab>"] = cmp.mapping(function(fallback)
 			if cmp.visible() then
 				cmp.select_next_item()
-			elseif luasnip.expand_or_jumpable() then
-				luasnip.expand_or_jump()
+			-- elseif luasnip.expand_or_jumpable() then
+			-- 	luasnip.expand_or_jump()
 			elseif has_words_before() then
-				cmp.complete()
+				cmp.complete({})
 			else
 				fallback() -- The fallback function sends a already mapped key. In this case, it's probably `<Tab>`.
 			end
@@ -37,8 +45,8 @@ cmp.setup({
 		["<S-Tab>"] = cmp.mapping(function()
 			if cmp.visible() then
 				cmp.select_prev_item()
-			elseif luasnip.expand_or_jumpable() then
-				luasnip.expand_or_jump()
+			-- elseif luasnip.expand_or_jumpable() then
+			-- 	luasnip.expand_or_jump()
 			end
 		end, { "i", "s" }),
 	}),

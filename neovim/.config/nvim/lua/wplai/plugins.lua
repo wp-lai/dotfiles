@@ -357,13 +357,12 @@ return require("packer").startup({
 			"numToStr/Comment.nvim",
 			config = function()
 				require("Comment").setup({})
-				local comment_ft = require("Comment.ft")
-				comment_ft.solidity = { "// %s", "/*%s*/" }
 			end,
 		})
 
 		use({
 			"Djancyp/better-comments.nvim",
+			disable = true,
 			config = function()
 				require("better-comment").Setup()
 			end,
@@ -608,7 +607,7 @@ return require("packer").startup({
 		-- snippets
 		use({
 			"L3MON4D3/LuaSnip",
-      tag = "v1.*",
+			tag = "v1.*",
 			config = [[ require("wplai.snippet") ]],
 		})
 
@@ -689,7 +688,7 @@ return require("packer").startup({
 		})
 		use({
 			"simrat39/rust-tools.nvim",
-      disable = true,
+			disable = true,
 			ft = "rust",
 			config = function()
 				local rust_opts = {
@@ -1015,5 +1014,11 @@ return require("packer").startup({
 			end,
 		})
 		use({ "sindrets/diffview.nvim", requires = "nvim-lua/plenary.nvim" })
+		use({
+			"ggandor/leap.nvim",
+			config = function()
+				require("leap").add_default_mappings()
+			end,
+		})
 	end,
 })
