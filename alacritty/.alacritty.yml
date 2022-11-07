@@ -22,6 +22,7 @@ env:
   # check the local terminfo database and use `alacritty` if it is
   # available, otherwise `xterm-256color` is used.
   TERM: xterm-256color
+  # TERM: screen-256color
 
 window:
   # Window dimensions (changes require restart)
@@ -121,6 +122,7 @@ font:
     # family: JetBrainsMono Nerd Font
     family: MonoLisa Nerd Font Mono
     # family: Noto Emoji
+    # family: BlexMono Nerd Font Mono
 
     # The `style` can be specified to pick a specific face.
     style: Regular
@@ -134,6 +136,7 @@ font:
     # family: Hack Nerd Font Mono
     # family: JetBrains Mono
     family: MonoLisa Nerd Font Mono
+    # family: BlexMono Nerd Font Mono
 
     # The `style` can be specified to pick a specific face.
     style: Bold
@@ -147,6 +150,8 @@ font:
     # family: Hack Nerd Font Mono
     # family: JetBrains Mono
     family: MonoLisa Nerd Font Mono
+    # family: Victor Mono
+    # family: BlexMono Nerd Font Mono
 
     # The `style` can be specified to pick a specific face.
     style: Italic
@@ -157,7 +162,10 @@ font:
     #
     # If the bold italic family is not specified, it will fall back to the
     # value specified for the normal font.
+    # family: JetBrains Mono
     family: MonoLisa Nerd Font Mono
+    # family: Victor Mono
+    # family: BlexMono Nerd Font Mono
 
     # The `style` can be specified to pick a specific face.
     style: Bold Italic
@@ -183,7 +191,7 @@ font:
   #
   # Thin strokes are suitable for retina displays, but for non-retina screens
   # it is recommended to set `use_thin_strokes` to `false`.
-  use_thin_strokes: true
+  # use_thin_strokes: true
 
   # Use built-in font for box drawing characters.
   #
@@ -527,8 +535,34 @@ schemes:
       - { index: 16, color: '#FAB387' }
       - { index: 17, color: '#F5E0DC' }
 
-# colors: *macchiato
+    embark: &embark
+      primary:
+        background: '0x1e1c31'
+        foreground: '0xcbe3e7'
+      cursor:
+        text: '0x1e1c31'
+        cursor: '0xa1efd3'
+      normal:
+        black: '0x1e1c31'
+        red: '0xf48fb1'
+        green: '0xa1efd3'
+        yellow: '0xffe6b3'
+        blue: '0x91ddff'
+        magenta: '0xd4bfff'
+        cyan: '0x87dfeb'
+        white: '0xcbe3e7'
+      bright:
+        black: '0x585273'
+        red: '0xf02e6e'
+        green: '0x62d196'
+        yellow: '0xf2b482'
+        blue: '0x65b2ff'
+        magenta: '0xa37acc'
+        cyan: '0x63f2f1'
+        white: '0x8a889d'
+
 colors: *macchiato
+# colors: *embark
 
 # # Embark theme
 # colors:
@@ -1319,6 +1353,14 @@ key_bindings:
   - { key: T, mods: Command|Shift, chars: "\x02\x21" }
   # Toggle the zoom state of the current tmux pane
   - { key: Z, mods: Command, chars: "\x02\x7a" }
+
+  - { key: J, mods: Alt, chars: "\x1bj" }
+  - { key: K, mods: Alt, chars: "\x1bk" }
+  - { key: H, mods: Alt, chars: "\x1bh" }
+  - { key: L, mods: Alt, chars: "\x1bl" }
+
+  - { key: Minus, mods: Alt, chars: "\x1B-" }
+  - { key: Equals, mods: Alt, chars: "\x1B=" }
 
 #debug:
   # Display the time it takes to redraw each frame.

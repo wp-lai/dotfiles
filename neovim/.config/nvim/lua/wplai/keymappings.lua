@@ -1,33 +1,24 @@
-local map = vim.api.nvim_set_keymap
-
--- map the leader key
--- map('n', '<Space>', '', {})
+-- map the leader key to space
 vim.g.mapleader = " "
 
--- copy/paste from system clipboard
-map("v", "<leader>y", '"+y', { noremap = true })
-map("v", "<leader>d", '"+d', { noremap = true })
-map("n", "<leader>p", '"+p', { noremap = true })
-map("n", "<leader>P", '"+P', { noremap = true })
-map("v", "<leader>p", '"+p', { noremap = true })
-map("v", "<leader>P", '"+P', { noremap = true })
+local keymap = vim.keymap
 
--- <leader>a to close quickfix window
--- map("n", "<leader>q", ":cclose<CR>:lclose<CR>:pclose<CR>", { noremap = true })
-
--- gx to open link & file with macOS 'open' command
-map("n", "gx", '<Cmd>call jobstart(["open", expand("<cfile>")], {"detach": v:true})<CR>', { noremap = true })
-
--- <M--> to "<-"
-map("i", "<M-->", "<-", { noremap = true })
-
--- <M-=> to ":="
-map("i", "<M-=>", ":=", { noremap = true })
-
--- move lines up or down
-map("n", "<M-Down>", ":m .+1<CR>==", { noremap = true })
-map("n", "<M-Up>", ":m .-2<CR>==", { noremap = true })
+-- remove highlight
+keymap.set("n", "<leader>nh", ":nohl<CR>")
 
 -- copy filepath to system clipboard
-map("n", "<leader>cs", ":let @+=expand('%')<CR>", { noremap = true })
-map("n", "<leader>cl", ":let @+=expand('%:p')<CR>", { noremap = true })
+keymap.set("n", "<leader>cs", ":let @+=expand('%')<CR>")
+keymap.set("n", "<leader>cl", ":let @+=expand('%:p')<CR>")
+
+-- copy/paste from system clipboard
+keymap.set("v", "<leader>y", '"+y')
+keymap.set("n", "<leader>p", '"+p')
+keymap.set("n", "<leader>P", '"+P')
+keymap.set("v", "<leader>p", '"+p')
+
+-- gx to open link & file with macOS 'open' command
+keymap.set("n", "gx", '<Cmd>call jobstart(["open", expand("<cfile>")], {"detach": v:true})<CR>')
+
+-- move lines up or down
+keymap.set("n", "<M-Down>", ":m .+1<CR>==")
+keymap.set("n", "<M-Up>", ":m .-2<CR>==")

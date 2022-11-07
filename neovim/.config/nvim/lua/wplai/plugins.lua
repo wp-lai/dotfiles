@@ -13,6 +13,7 @@ return require("packer").startup({
 			require("packer").sync()
 		end
 
+		-- essential
 		use({
 			"wbthomason/packer.nvim",
 			config = function()
@@ -26,35 +27,133 @@ return require("packer").startup({
 			end,
 		})
 		use("nvim-lua/plenary.nvim")
+		use({
+			"nvim-tree/nvim-web-devicons",
+			config = function()
+				require("nvim-web-devicons").setup({})
+			end,
+		})
+
+		-- optimization
+		use({ "nathom/filetype.nvim" })
+		use({ "lewis6991/impatient.nvim" })
+
+		-- surround
+		use("tpope/vim-surround")
+
+		-- pairs
+		use({
+			"windwp/nvim-autopairs",
+			config = function()
+				require("nvim-autopairs").setup({})
+				require("cmp").event:on("confirm_done", require("nvim-autopairs.completion.cmp").on_confirm_done())
+			end,
+		})
+
+		-- rm whitespace
+		use("ntpeters/vim-better-whitespace")
+
+		-- comment
+		use({
+			"numToStr/Comment.nvim",
+			config = function()
+				require("Comment").setup({})
+			end,
+		})
+		use({
+			"folke/todo-comments.nvim",
+			requires = "nvim-lua/plenary.nvim",
+			config = function()
+				require("todo-comments").setup({})
+			end,
+		})
+
+		-- smooth scroll
+		use({
+			"karb94/neoscroll.nvim",
+			config = function()
+				require("neoscroll").setup()
+			end,
+		})
+
+		-- search
+		use({
+			"google/vim-searchindex",
+			keys = "/",
+		})
+
+		-- fuzzy finding - telescope
+		use({
+			"nvim-telescope/telescope.nvim",
+			tag = "0.1.0",
+			requires = "nvim-lua/plenary.nvim",
+			config = function()
+				require("telescope").setup({})
+
+				local builtin = require("telescope.builtin")
+				vim.keymap.set("n", "<leader>ff", builtin.find_files, {})
+				vim.keymap.set("n", "<leader>wg", builtin.live_grep, {})
+				vim.keymap.set("n", "<leader>fb", builtin.buffers, {})
+				vim.keymap.set("n", "<leader>fh", builtin.help_tags, {})
+				vim.keymap.set("n", "<leader>fs", builtin.treesitter, {})
+				vim.keymap.set("n", "<leader>ws", builtin.lsp_workspace_symbols, {})
+				vim.keymap.set("n", "<leader>fd", builtin.diagnostics, {})
+
+				vim.keymap.set(
+					"n",
+					"<leader>en",
+					"<cmd>lua require('telescope.builtin').find_files{cwd='~/.config/nvim'}<CR>"
+				)
+			end,
+		})
+		use({
+			"nvim-telescope/telescope-fzf-native.nvim",
+			run = "make",
+			config = function()
+				require("telescope").load_extension("fzf")
+			end,
+		})
+		use({
+			"jvgrootveld/telescope-zoxide",
+			config = function()
+				require("telescope").load_extension("zoxide")
+				vim.keymap.set("n", "<leader>fz", ":lua require'telescope'.extensions.zoxide.list{}<CR>")
+			end,
+		})
+		use({
+			"smartpde/telescope-recent-files",
+			config = function()
+				require("telescope").load_extension("recent_files")
+				vim.keymap.set("n", "<Leader>fr", [[<cmd>lua require('telescope').extensions.recent_files.pick()<CR>]])
+			end,
+		})
+
+		-- tab
+		use({
+			"akinsho/bufferline.nvim",
+			tag = "v3.*",
+			config = function()
+				require("bufferline").setup({
+					options = {
+						diagnostics = "nvim_lsp",
+						disgnostics_update_in_insert = true,
+					},
+				})
+				vim.keymap.set("n", "]b", ":BufferLineCycleNext<CR>")
+				vim.keymap.set("n", "[b", ":BufferLineCyclePrev<CR>")
+			end,
+		})
+
+		-- status line
+		use({
+			"glepnir/galaxyline.nvim",
+			branch = "main",
+			config = function()
+				require("wplai.statusline")
+			end,
+		})
 
 		-- aesthetics
-		use({
-			"sainnhe/gruvbox-material",
-			disable = true,
-			setup = function()
-				vim.o.termguicolors = true
-				vim.g.gruvbox_material_better_performance = 1
-			end,
-			config = function()
-				vim.cmd([[colorscheme gruvbox-material]])
-			end,
-		})
-		use({
-			"rebelot/kanagawa.nvim",
-			disable = true,
-			config = function()
-				vim.cmd("colorscheme kanagawa")
-			end,
-		})
-		use({
-			"rmehri01/onenord.nvim",
-			disable = true,
-			config = function()
-				vim.cmd("colorscheme onenord")
-				vim.cmd([[highlight Normal guibg=none]])
-				vim.cmd([[highlight NoneText guibg=none]])
-			end,
-		})
 		use({
 			"catppuccin/nvim",
 			as = "catppuccin",
@@ -63,16 +162,6 @@ return require("packer").startup({
 				require("catppuccin").setup({
 					transparent_background = true,
 					term_colors = true,
-					-- dim_inactive = {
-					-- 	enabled = true,
-					-- 	shade = "dark",
-					-- 	percentage = 0.15,
-					-- },
-					compile = {
-						enabled = true,
-						path = vim.fn.stdpath("cache") .. "/catppuccin",
-						suffix = "_compiled",
-					},
 					integrations = {
 						cmp = true,
 						gitsigns = true,
@@ -97,50 +186,19 @@ return require("packer").startup({
 						},
 					},
 				})
-				-- vim.g.catppuccin_flavour = "frappe" -- latte, frappe, macchiato, mocha
-				vim.g.catppuccin_flavour = "macchiato" -- latte, frappe, macchiato, mocha
-				vim.cmd([[colorscheme catppuccin]])
+				-- catppuccin-latte, catppuccin-frappe, catppuccin-macchiato, catppuccin-mocha
+				vim.cmd([[colorscheme catppuccin-mocha]])
 			end,
 		})
-		use({
-			"shaunsingh/oxocarbon.nvim",
-			run = "./install.sh",
-			disable = true,
-			config = function()
-				vim.cmd("colorscheme oxocarbon")
-			end,
-		})
-		use({
-			"luisiacc/gruvbox-baby",
-			disable = true,
-			config = function()
-				vim.g.gruvbox_baby_transparent_mode = 1
-				vim.cmd("colorscheme gruvbox-baby")
-			end,
-		})
-
-		use({ "stevearc/dressing.nvim" })
 		use({
 			"hood/popui.nvim",
-			requires = {
-				"RishabhRD/popfix",
-			},
 			config = function()
 				vim.ui.select = require("popui.ui-overrider")
 				vim.ui.input = require("popui.input-overrider")
 			end,
 		})
 
-		use({ "mhinz/vim-startify" })
-
-		use({
-			"glepnir/galaxyline.nvim",
-			branch = "main",
-			config = function()
-				require("wplai.statusline")
-			end,
-		})
-
+		-- indentation guids
 		use({
 			"lukas-reineke/indent-blankline.nvim",
 			config = function()
@@ -151,69 +209,16 @@ return require("packer").startup({
 			end,
 		})
 
-		use("ntpeters/vim-better-whitespace")
+		-- start screen
+		use({ "mhinz/vim-startify" })
 
+		-- maximize window
 		use({
-			"kyazdani42/nvim-web-devicons",
-			config = function()
-				require("nvim-web-devicons").setup({
-					override = {
-						css = { icon = "", color = "#61afef", name = "css" },
-						html = { icon = "", color = "#DE8C92", name = "html" },
-						jpeg = { icon = " ", color = "#BD77DC", name = "jpeg" },
-						jpg = { icon = " ", color = "#BD77DC", name = "jpg" },
-						js = { icon = "", color = "#EBCB8B", name = "js" },
-						mp3 = { icon = "", color = "#C8CCD4", name = "mp3" },
-						mp4 = { icon = "", color = "#C8CCD4", name = "mp4" },
-						out = { icon = "", color = "#C8CCD4", name = "out" },
-						png = { icon = " ", color = "#BD77DC", name = "png" },
-						toml = { icon = "", color = "#61afef", name = "toml" },
-						ts = { icon = "ﯤ", color = "#519ABA", name = "ts" },
-						xz = { icon = "", color = "#EBCB8B", name = "xz" },
-						zip = { icon = "", color = "#EBCB8B", name = "zip" },
-						zsh = { icon = "", color = "#428850", name = "Zsh" },
-					},
-				})
-			end,
+			"szw/vim-maximizer",
+			keys = "<F3>",
 		})
 
-		use({
-			"google/vim-searchindex",
-			keys = "/",
-		})
-
-		-- optimization
-		use({ "nathom/filetype.nvim" })
-		use({ "lewis6991/impatient.nvim" })
-
-		-- utilities
-		use({
-			"kyazdani42/nvim-tree.lua",
-			requires = {
-				"kyazdani42/nvim-web-devicons",
-			},
-			cmd = "NvimTreeToggle",
-			setup = function()
-				vim.g.nvim_tree_icons = {
-					default = " ",
-					symlink = " ",
-					git = {
-						unstaged = "✗",
-						staged = "✓",
-						unmerged = "",
-						renamed = "➜",
-						untracked = "★",
-					},
-					folder = { default = "", open = "" },
-				}
-			end,
-			config = function()
-				require("nvim-tree").setup({
-					update_cwd = true,
-				})
-				vim.api.nvim_set_keymap("n", "<leader>tr", ":NvimTreeToggle<cr>", { noremap = true, silent = true })
-			end,
-		})
+		-- folding
 		use({
 			"kevinhwang91/nvim-ufo",
 			requires = "kevinhwang91/promise-async",
@@ -221,68 +226,10 @@ return require("packer").startup({
 				vim.keymap.set("n", "zR", require("ufo").openAllFolds)
 				vim.keymap.set("n", "zM", require("ufo").closeAllFolds)
 				require("ufo").setup({
-					provider_selector = function(bufnr, filetype, buftype)
+					provider_selector = function(_, _, _)
 						return { "treesitter", "indent" }
 					end,
-					open_fold_hl_timeout = 150,
-					preview = {
-						win_config = {
-							border = { "", "─", "", "", "", "─", "", "" },
-							winhighlight = "Normal:Folded",
-							winblend = 0,
-						},
-						mappings = {
-							scrollU = "<C-u>",
-							scrollD = "<C-d>",
-						},
-					},
-					fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
-						local newVirtText = {}
-						local suffix = ("  %d "):format(endLnum - lnum)
-						local sufWidth = vim.fn.strdisplaywidth(suffix)
-						local targetWidth = width - sufWidth
-						local curWidth = 0
-						for _, chunk in ipairs(virtText) do
-							local chunkText = chunk[1]
-							local chunkWidth = vim.fn.strdisplaywidth(chunkText)
-							if targetWidth > curWidth + chunkWidth then
-								table.insert(newVirtText, chunk)
-							else
-								chunkText = truncate(chunkText, targetWidth - curWidth)
-								local hlGroup = chunk[2]
-								table.insert(newVirtText, { chunkText, hlGroup })
-								chunkWidth = vim.fn.strdisplaywidth(chunkText)
-								-- str width returned from truncate() may less than 2nd argument, need padding
-								if curWidth + chunkWidth < targetWidth then
-									suffix = suffix .. (" "):rep(targetWidth - curWidth - chunkWidth)
-								end
-								break
-							end
-							curWidth = curWidth + chunkWidth
-						end
-						table.insert(newVirtText, { suffix, "MoreMsg" })
-						return newVirtText
-					end,
 				})
-			end,
-		})
-		use({
-			"karb94/neoscroll.nvim",
-			config = function()
-				require("neoscroll").setup()
-			end,
-		})
-
-		use({
-			"JoseConseco/iswap.nvim",
-			config = function()
-				vim.api.nvim_set_keymap("n", "<m-h>", "<cmd>ISwapCursorNodeLeft<CR>", { noremap = true, silent = true }) -- move cursor node right
-				vim.api.nvim_set_keymap(
-					"n",
-					"<m-l>",
-					"<cmd>ISwapCursorNodeRight<CR>",
-					{ noremap = true, silent = true }
-				) -- move cursor node left
 			end,
 		})
 
@@ -294,88 +241,7 @@ return require("packer").startup({
 			end,
 		})
 
-		-- debugger
-		-- use({ "mfussenegger/nvim-dap", config = [[ require"wplai.dap"]] })
-		-- use("rcarriga/nvim-dap-ui")
-		-- use({
-		-- 	"theHamsta/nvim-dap-virtual-text",
-		-- 	config = function()
-		-- 		require("nvim-dap-virtual-text").setup({})
-		-- 	end,
-		-- })
-
-		-- Session management
-		use({
-			"folke/persistence.nvim",
-			disable = true,
-			event = "BufReadPre", -- this will only start session saving when an actual file was opened
-			module = "persistence",
-			config = function()
-				require("persistence").setup()
-
-				-- restore the session for the current directory
-				vim.api.nvim_set_keymap(
-					"n",
-					"<leader>qs",
-					[[<cmd>lua require("persistence").load()<cr>]],
-					{ noremap = true, silent = true }
-				)
-
-				-- restore the last session
-				vim.api.nvim_set_keymap(
-					"n",
-					"<leader>ql",
-					[[<cmd>lua require("persistence").load({ last = true })<cr>]],
-					{ noremap = true, silent = true }
-				)
-
-				-- stop Persistence => session won't be saved on exit
-				vim.api.nvim_set_keymap(
-					"n",
-					"<leader>qd",
-					[[<cmd>lua require("persistence").stop()<cr>]],
-					{ noremap = true, silent = true }
-				)
-			end,
-		})
-
-		use({
-			"szw/vim-maximizer",
-			keys = "<F3>",
-		})
-
-		use("tpope/vim-surround")
-
-		use({
-			"windwp/nvim-autopairs",
-			config = function()
-				require("nvim-autopairs").setup({})
-			end,
-		})
-
-		use({
-			"numToStr/Comment.nvim",
-			config = function()
-				require("Comment").setup({})
-			end,
-		})
-
-		use({
-			"Djancyp/better-comments.nvim",
-			disable = true,
-			config = function()
-				require("better-comment").Setup()
-			end,
-		})
-
-		use({
-			"folke/todo-comments.nvim",
-			requires = "nvim-lua/plenary.nvim",
-			config = function()
-				require("todo-comments").setup({})
-			end,
-		})
-
+		-- formatter
 		use({
 			"mhartington/formatter.nvim",
 			ft = {
@@ -388,6 +254,7 @@ return require("packer").startup({
 				"solidity",
 				"javascriptreact",
 				"typescriptreact",
+				"solidity",
 			},
 			config = function()
 				local prettier = function()
@@ -438,80 +305,30 @@ return require("packer").startup({
 						},
 					},
 				})
-				vim.api.nvim_set_keymap("n", "<leader>=", "<cmd>Format<CR>", { noremap = true })
+				vim.keymap.set("n", "<leader>=", "<cmd>Format<CR>")
 			end,
 		})
 
+		-- float terminal
 		use({
 			"voldikss/vim-floaterm",
 			keys = "<M-d>",
 			config = function()
-				vim.api.nvim_set_keymap("n", "<M-d>", ":FloatermToggle<CR>", { noremap = true, silent = true })
-				vim.api.nvim_set_keymap(
-					"t",
-					"<M-d>",
-					"<C-\\><C-n>:FloatermToggle<CR>",
-					{ noremap = true, silent = true }
-				)
+				vim.keymap.set("n", "<M-d>", ":FloatermToggle<CR>")
+				vim.keymap.set("t", "<M-d>", "<C-\\><C-n>:FloatermToggle<CR>")
 			end,
 		})
 
+		-- startuptime
 		use({
 			"tweekmonster/startuptime.vim",
 			opt = true,
 		})
 
-		-- telescope
-		use({
-			"nvim-telescope/telescope.nvim",
-			tag = "0.1.0",
-			requires = "nvim-lua/plenary.nvim",
-			config = [[ require("wplai.telescope") ]],
-		})
-		use({
-			"nvim-telescope/telescope-fzf-native.nvim",
-			run = "make",
-			config = function()
-				require("telescope").load_extension("fzf")
-			end,
-		})
-		use({
-			"jvgrootveld/telescope-zoxide",
-			config = function()
-				require("telescope").load_extension("zoxide")
-
-				vim.api.nvim_set_keymap(
-					"n",
-					"<leader>fz",
-					":lua require'telescope'.extensions.zoxide.list{}<CR>",
-					{ noremap = true, silent = true }
-				)
-			end,
-		})
-		use({
-			"smartpde/telescope-recent-files",
-			config = function()
-				require("telescope").load_extension("recent_files")
-				vim.api.nvim_set_keymap(
-					"n",
-					"<Leader>rr",
-					[[<cmd>lua require('telescope').extensions.recent_files.pick()<CR>]],
-					{ noremap = true, silent = true }
-				)
-			end,
-		})
-		-- use({
-		-- 	"nvim-telescope/telescope-dap.nvim",
-		-- 	config = function()
-		-- 		require("telescope").load_extension("dap")
-		-- 	end,
-		-- })
-
 		-- treesitter
 		use({
 			"nvim-treesitter/nvim-treesitter",
 			run = ":TSUpdate",
-			config = [[ require('wplai.treesitter') ]],
 			requires = {
 				{
 					"nvim-treesitter/nvim-treesitter-refactor",
@@ -524,7 +341,6 @@ return require("packer").startup({
 				},
 				{
 					"windwp/nvim-ts-autotag",
-					ft = { "html", "xml" },
 				},
 				{
 					"JoosepAlviste/nvim-ts-context-commentstring",
@@ -533,6 +349,16 @@ return require("packer").startup({
 					"nvim-treesitter/nvim-treesitter-context",
 				},
 			},
+			config = function()
+				require("wplai.treesitter")
+			end,
+		})
+		use({
+			"JoseConseco/iswap.nvim",
+			config = function()
+				require("iswap").setup({})
+				vim.keymap.set("n", "<leader>sw", ":ISwapWith<CR>")
+			end,
 		})
 
 		-- completion
@@ -550,7 +376,46 @@ return require("packer").startup({
 				"saadparwaiz1/cmp_luasnip",
 				"ray-x/cmp-treesitter",
 			},
-			config = [[ require("wplai.nvim-cmp") ]],
+			config = function()
+				require("wplai.nvim-cmp")
+			end,
+		})
+
+		-- copilot
+		use({
+			"zbirenbaum/copilot.lua",
+			event = "VimEnter",
+			config = function()
+				vim.schedule(function()
+					require("copilot").setup()
+				end)
+			end,
+		})
+		use({
+			"zbirenbaum/copilot-cmp",
+			after = { "copilot.lua" },
+			config = function()
+				require("copilot_cmp").setup()
+			end,
+		})
+
+		-- snippets
+		use({
+			"L3MON4D3/LuaSnip",
+			tag = "v1.*",
+			config = function()
+				require("luasnip.loaders.from_vscode").lazy_load({
+					paths = { "$HOME/.config/nvim/snippets/" },
+				})
+				-- mappings
+				vim.cmd([[
+          imap <silent><expr> <c-k> luasnip#expand_or_jumpable() ? '<Plug>luasnip-expand-or-jump' : '<c-k>'
+          inoremap <silent> <c-j> <cmd>lua require('luasnip').jump(-1)<CR>
+
+          snoremap <silent> <c-k> <cmd>lua require('luasnip').jump(1)<CR>
+          snoremap <silent> <c-j> <cmd>lua require('luasnip').jump(-1)<CR>
+        ]])
+			end,
 		})
 
 		-- language server
@@ -569,9 +434,13 @@ return require("packer").startup({
 				"solidity",
 				"typescriptreact",
 				"javascriptreact",
+				"move",
 			},
-			config = [[ require"wplai.lsp" ]],
+			config = function()
+				require("wplai.lsp")
+			end,
 		})
+		-- visualize lsp progress
 		use({
 			"j-hui/fidget.nvim",
 			config = function()
@@ -579,101 +448,21 @@ return require("packer").startup({
 			end,
 		})
 
-		-- tab
-		use({
-			"akinsho/bufferline.nvim",
-			tag = "v2.*",
-			requires = "kyazdani42/nvim-web-devicons",
-			config = function()
-				require("bufferline").setup()
-				vim.opt.termguicolors = true
-				vim.api.nvim_set_keymap("n", "]b", ":BufferLineCycleNext<CR>", { noremap = true, silent = true })
-				vim.api.nvim_set_keymap("n", "[b", ":BufferLineCyclePrev<CR>", { noremap = true, silent = true })
-			end,
-		})
-
 		-- outline
 		use({
 			"simrat39/symbols-outline.nvim",
-			ft = { "go", "rust", "lua", "javascript", "typescript", "solidity" },
-			setup = function()
-				vim.g.symbols_outline = { keymaps = { close = "q" } }
-			end,
+			ft = { "go", "rust", "lua", "javascript", "typescript", "solidity", "markdown" },
 			config = function()
-				vim.api.nvim_set_keymap("n", "gO", ":SymbolsOutline<CR>", { noremap = true, silent = true })
+				require("symbols-outline").setup()
+				vim.keymap.set("n", "gO", ":SymbolsOutline<CR>")
 			end,
 		})
 
-		-- snippets
-		use({
-			"L3MON4D3/LuaSnip",
-			tag = "v1.*",
-			config = [[ require("wplai.snippet") ]],
-		})
-
-		-- linter
-		use({
-			"mfussenegger/nvim-lint",
-			ft = { "go", "rust" },
-			disable = true,
-			config = function()
-				require("lint").linters_by_ft = {
-					go = { "golangcilint" },
-				}
-				vim.cmd([[
-        augroup nvim-lint
-          autocmd!
-          autocmd BufWritePost *.go lua require('lint').try_lint()
-        augroup END
-        ]])
-			end,
-		})
-
-		use({
-			"dense-analysis/ale",
-			disable = true,
-			ft = "solidity",
-			setup = function()
-				vim.g.ale_solidity_solc_options = "--base-path . --include-path node_modules/"
-				-- vim.g.ale_solidity_solc_executable = '/Users/wplai/Library/Caches/hardhat-nodejs/compilers/macosx-amd64/solc-macosx-amd64-v0.8.9+commit.e5eed63a'
-			end,
-		})
-
+		-- diagnostics
 		use({
 			"folke/trouble.nvim",
 			config = function()
-				require("trouble").setup({
-					fold_open = "▾",
-					fold_closed = "▸",
-					indent_lines = false,
-					signs = {
-						error = "",
-						warning = "",
-						hint = "",
-						information = "",
-						other = "",
-					},
-					action_keys = { jump = { "<cr>" }, toggle_fold = { "<tab>" } },
-				})
-				vim.api.nvim_set_keymap("n", "<space>xx", "<cmd>TroubleToggle<CR>", { silent = true, noremap = true })
-				vim.api.nvim_set_keymap(
-					"n",
-					"<space>xw",
-					"<cmd>TroubleToggle lsp_workspace_diagnostics<CR>",
-					{ silent = true, noremap = true }
-				)
-				vim.api.nvim_set_keymap(
-					"n",
-					"<space>xb",
-					"<cmd>TroubleToggle lsp_document_diagnostics<CR>",
-					{ silent = true, noremap = true }
-				)
-				vim.api.nvim_set_keymap(
-					"n",
-					"<space>xq",
-					"<cmd>TroubleToggle quickfix<CR>",
-					{ silent = true, noremap = true }
-				)
+				require("trouble").setup({})
 			end,
 		})
 
@@ -681,188 +470,10 @@ return require("packer").startup({
 		use({
 			"saecki/crates.nvim",
 			tag = "v0.3.0",
+			event = "BufRead Cargo.toml",
 			requires = { "nvim-lua/plenary.nvim" },
 			config = function()
 				require("crates").setup()
-			end,
-		})
-		use({
-			"simrat39/rust-tools.nvim",
-			disable = true,
-			ft = "rust",
-			config = function()
-				local rust_opts = {
-					server = {
-						standalone = false,
-						on_attach = function(client, bufnr)
-							vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
-							local opts = { noremap = true, silent = true }
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"gd",
-								"<cmd>lua vim.lsp.buf.declaration()<cr>",
-								opts
-							)
-							vim.api.nvim_buf_set_keymap(bufnr, "n", "gD", "<cmd>lua vim.lsp.buf.definition()<cr>", opts)
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"<C-]>",
-								"<cmd>lua vim.lsp.buf.implementation()<CR>",
-								opts
-							)
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"K",
-								"<cmd>lua require'rust-tools.hover_actions'.hover_actions()",
-								opts
-							)
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"<C-k>",
-								"<cmd>lua vim.lsp.buf.signature_help()<CR>",
-								opts
-							)
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"<leader>wa",
-								"<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>",
-								opts
-							)
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"<leader>wr",
-								"<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>",
-								opts
-							)
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"<leader>wl",
-								"<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>",
-								opts
-							)
-
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"gD",
-								"<cmd>lua vim.lsp.buf.declaration()<CR>",
-								opts
-							)
-							vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
-							vim.api.nvim_buf_set_keymap(bufnr, "n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"gi",
-								"<cmd>lua vim.lsp.buf.implementation()<CR>",
-								opts
-							)
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"<C-k>",
-								"<cmd>lua vim.lsp.buf.signature_help()<CR>",
-								opts
-							)
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"<space>wa",
-								"<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>",
-								opts
-							)
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"<space>wr",
-								"<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>",
-								opts
-							)
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"<space>wl",
-								"<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>",
-								opts
-							)
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"<space>D",
-								"<cmd>lua vim.lsp.buf.type_definition()<CR>",
-								opts
-							)
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"<space>rn",
-								"<cmd>lua vim.lsp.buf.rename()<CR>",
-								opts
-							)
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"<space>ca",
-								"<cmd>lua vim.lsp.buf.code_action()<CR>",
-								opts
-							)
-							vim.api.nvim_buf_set_keymap(bufnr, "n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"<space>f",
-								"<cmd>lua vim.lsp.buf.formatting()<CR>",
-								opts
-							)
-
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"<space>e",
-								"<cmd>lua vim.diagnostic.open_float()<CR>",
-								opts
-							)
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"[d",
-								"<cmd>lua vim.diagnostic.goto_prev()<CR>",
-								opts
-							)
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"]d",
-								"<cmd>lua vim.diagnostic.goto_next()<CR>",
-								opts
-							)
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"<space>q",
-								"<cmd>lua vim.diagnostic.setloclist()<CR>",
-								opts
-							)
-
-							vim.api.nvim_buf_set_keymap(
-								bufnr,
-								"n",
-								"<space>rr",
-								"<cmd>lua require('rust-tools.runnables').runnables()<CR>",
-								opts
-							)
-						end,
-					},
-				}
-
-				require("rust-tools").setup(rust_opts)
 			end,
 		})
 
@@ -870,78 +481,6 @@ return require("packer").startup({
 		use({
 			"gennaro-tedesco/nvim-jqx",
 			ft = "json",
-		})
-
-		-- http client
-		use({
-			"NTBBloodbath/rest.nvim",
-			disable = true,
-			ft = "http",
-			requires = "nvim-lua/plenary.nvim",
-			config = function()
-				require("rest-nvim").setup()
-			end,
-		})
-
-		-- for package.json
-		use({
-			"vuki656/package-info.nvim",
-			requires = "MunifTanjim/nui.nvim",
-			disable = true,
-			config = function()
-				require("package-info").setup({
-					package_manager = "pnpm",
-				})
-				-- Show package versions
-				vim.api.nvim_set_keymap(
-					"n",
-					"<leader>ns",
-					":lua require('package-info').show()<CR>",
-					{ silent = true, noremap = true }
-				)
-				-- Hide package versions
-				vim.api.nvim_set_keymap(
-					"n",
-					"<leader>nc",
-					":lua require('package-info').hide()<CR>",
-					{ silent = true, noremap = true }
-				)
-				-- Update package on line
-				vim.api.nvim_set_keymap(
-					"n",
-					"<leader>nu",
-					":lua require('package-info').update()<CR>",
-					{ silent = true, noremap = true }
-				)
-				-- Delete package on line
-				vim.api.nvim_set_keymap(
-					"n",
-					"<leader>nd",
-					":lua require('package-info').delete()<CR>",
-					{ silent = true, noremap = true }
-				)
-				-- Install a new package
-				vim.api.nvim_set_keymap(
-					"n",
-					"<leader>ni",
-					":lua require('package-info').install()<CR>",
-					{ silent = true, noremap = true }
-				)
-				-- Reinstall dependencies
-				vim.api.nvim_set_keymap(
-					"n",
-					"<leader>nr",
-					":lua require('package-info').reinstall()<CR>",
-					{ silent = true, noremap = true }
-				)
-				-- Install a different package version
-				vim.api.nvim_set_keymap(
-					"n",
-					"<leader>np",
-					":lua require('package-info').change_version()<CR>",
-					{ silent = true, noremap = true }
-				)
-			end,
 		})
 
 		-- solidity
@@ -1014,11 +553,16 @@ return require("packer").startup({
 			end,
 		})
 		use({ "sindrets/diffview.nvim", requires = "nvim-lua/plenary.nvim" })
+
+		-- easy motion
 		use({
 			"ggandor/leap.nvim",
 			config = function()
 				require("leap").add_default_mappings()
 			end,
 		})
+
+		-- move language
+		use({ "modocache/move.vim" })
 	end,
 })

@@ -1,48 +1,57 @@
 -- alias
 local o = vim.opt
-local g = vim.g
 
--- global options
+-- line numbers
+o.number = true
+o.relativenumber = true
+
+-- completion
+o.completeopt = { "menuone", "noinsert", "noselect" }
+o.shortmess:append({ c = true })
+
+-- search settings
 o.ignorecase = true
 o.smartcase = true
-o.joinspaces = false
-o.hidden = true
-o.showmatch = true
-o.splitbelow = true
-o.splitright = true
-o.mouse = "a"
-o.scrolloff = 8
-o.updatetime = 1000
+
+-- tabs & indentation
 o.tabstop = 4
 o.softtabstop = 4
 o.shiftwidth = 4
 o.expandtab = true
-o.relativenumber = true
-o.number = true
-o.wrap = false
--- o.colorcolumn = "80"
-o.foldenable = true
-o.foldlevel = 99 -- unfold when open
--- o.foldcolumn = '1'
-o.foldlevelstart = -1
-o.foldenable = true
-o.signcolumn = "yes"
-o.undofile = true
-o.undodir = vim.fn.stdpath("data") .. "/undo/"
-o.pumblend = 10 -- enable transparency for the popup-menu
-o.inccommand = "nosplit" -- preview the effects of command
-o.iskeyword:prepend({ "-" }) -- treat dash separated words as a word textobject
+
+-- appearance
 o.termguicolors = true
 o.laststatus = 3
+o.signcolumn = "yes"
+o.colorcolumn = "80"
+o.pumblend = 15 -- enable transparency for the popup-menu
 
-o.completeopt = { "menu", "menuone", "noselect" }
-o.shortmess:append({ c = true })
+-- mouse
+o.mouse = "a"
+
+-- line wrapping
+o.wrap = false
+
+-- split windows
+o.splitbelow = true
+o.splitright = true
+
+-- scroll
+o.scrolloff = 8
+
+-- swap
+o.updatetime = 1000
+
+-- fold
+o.foldlevel = 99 -- unfold when open
+
+-- undofile
+o.undofile = true
+o.undodir = vim.fn.stdpath("data") .. "/undo/"
+
+-- word pattern
+o.iskeyword:prepend({ "-" }) -- treat dash separated words as a word textobject
 
 -- netrw
-g.netrw_banner = 0
-g.netrw_liststyle = 3
-
--- python
-g.loaded_python_provider = 0
--- g.python_host_prog = "/usr/bin/python2"
-g.python3_host_prog = "/usr/bin/python3"
+vim.g.netrw_banner = 0
+vim.g.netrw_liststyle = 3

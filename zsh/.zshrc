@@ -42,7 +42,7 @@ export GO111MODULE=on
 #####################
 # python            #
 #####################
-export PATH="$PATH:$HOME/Library/Python/3.8/bin"
+# export PATH="$PATH:$HOME/Library/Python/3.8/bin"
 
 
 #####################
@@ -164,5 +164,9 @@ export BAT_THEME="Catppuccin-macchiato"
 # tabtab source for packages
 # uninstall by removing these lines
 [[ -f ~/.config/tabtab/zsh/__tabtab.zsh ]] && . ~/.config/tabtab/zsh/__tabtab.zsh || true
+
+eval "$(fnm env --use-on-cd)"
+
+export PATH="$PATH:$HOME/bin"
 
 source "$HOME/.private.zsh"
